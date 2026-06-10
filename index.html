@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kisna MDF · Marketing Development Fund</title>
+<meta name="description" content="MDF tracker for Kisna jewellery franchise stores — pool, utilisation, expenses">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#0D1117;--bgc:#161B22;--bgh:#1C2128;--bgi:#0D1117;
+  --bd:#30363D;--bdf:#388BFD;
+  --tx:#E6EDF3;--tx2:#8B949E;--tx3:#6E7681;
+  --acc:#C9A84C;--acc1:rgba(201,168,76,.12);--acc2:rgba(201,168,76,.22);
+  --gn:#3FB950;--gn1:rgba(63,185,80,.12);--gn2:rgba(63,185,80,.22);
+  --am:#D29922;--am1:rgba(210,153,34,.12);
+  --rd:#F85149;--rd1:rgba(248,81,73,.12);
+  --bl:#58A6FF;--bl1:rgba(88,166,255,.12);--bl2:rgba(88,166,255,.22);
+  --sh:0 1px 4px rgba(0,0,0,.5);--shl:0 8px 32px rgba(0,0,0,.55);
+  --r1:6px;--r2:8px;--r3:12px;--r4:16px;--tr:.15s ease
+}
+[data-theme=light]{
+  --bg:#F6F8FA;--bgc:#FFFFFF;--bgh:#F0F2F4;--bgi:#FFFFFF;
+  --bd:#D0D7DE;--bdf:#0969DA;
+  --tx:#1F2328;--tx2:#656D76;--tx3:#8C959F;
+  --acc:#9A6E00;--acc1:rgba(154,110,0,.08);--acc2:rgba(154,110,0,.16);
+  --gn:#1A7F37;--gn1:rgba(26,127,55,.08);--gn2:rgba(26,127,55,.16);
+  --am:#9A6700;--am1:rgba(154,103,0,.08);
+  --rd:#CF222E;--rd1:rgba(207,34,46,.08);
+  --bl:#0969DA;--bl1:rgba(9,105,218,.08);--bl2:rgba(9,105,218,.16);
+  --sh:0 1px 3px rgba(0,0,0,.1);--shl:0 8px 24px rgba(0,0,0,.14)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--tx);background:var(--bg);line-height:1.5;min-height:100vh;transition:background .2s,color .2s}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:99px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:2px;padding:0 16px;height:52px;background:rgba(13,17,23,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);flex-wrap:nowrap}
+[data-theme=light] .nav{background:rgba(246,248,250,.9)}
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--tx);padding-right:14px;margin-right:6px;border-right:1px solid var(--bd);flex-shrink:0;letter-spacing:-.01em}
+.brand-ico{width:28px;height:28px;border-radius:var(--r2);background:var(--acc1);border:1px solid var(--acc2);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:14px}
+.nb{display:flex;align-items:center;gap:5px;padding:6px 10px;font-size:12.5px;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--tx2);border-radius:var(--r2);transition:all var(--tr);white-space:nowrap}
+.nb:hover{background:var(--bgh);color:var(--tx)}
+.nb.active{background:var(--bgh);color:var(--tx);font-weight:600}
+.nb i{font-size:15px}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.sync-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);padding:4px 10px;border-radius:99px;background:var(--bgh);border:1px solid var(--bd)}
+.sync-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);transition:background .3s,box-shadow .3s}
+.sync-pill.ok .dot{background:var(--gn);box-shadow:0 0 5px var(--gn)}
+.theme-btn{width:32px;height:32px;border-radius:var(--r2);border:1px solid var(--bd);background:var(--bgh);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all var(--tr)}
+.theme-btn:hover{background:var(--bd);color:var(--tx)}
+
+/* LAYOUT */
+.page{display:none;padding:20px;max-width:1400px;margin:0 auto;animation:pgIn .18s ease}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:768px){.g4{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
+@media(max-width:480px){.page{padding:12px}.nb span{display:none}}
+
+/* CARDS */
+.card{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r3);padding:16px 18px;margin-bottom:16px}
+.card.mb0{margin-bottom:0}
+.ct{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:14px;color:var(--tx)}
+.ct i{font-size:16px;color:var(--tx2)}
+
+/* STAT CARDS */
+.stat-card{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r3);padding:16px 18px;position:relative;overflow:hidden;transition:transform var(--tr),box-shadow var(--tr)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shl)}
+.stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07;pointer-events:none}
+.sc-bl::after{background:var(--bl)}.sc-gn::after{background:var(--gn)}.sc-am::after{background:var(--am)}.sc-rd::after{background:var(--rd)}
+.si{width:36px;height:36px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px}
+.si.bl{background:var(--bl1);color:var(--bl)}.si.gn{background:var(--gn1);color:var(--gn)}.si.am{background:var(--am1);color:var(--am)}.si.rd{background:var(--rd1);color:var(--rd)}
+.sl{font-size:10.5px;color:var(--tx2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.sv{font-size:24px;font-weight:700;line-height:1.1}
+.ss{font-size:11px;color:var(--tx2);margin-top:4px}
+.sbar{height:3px;background:var(--bgh);border-radius:99px;margin-top:12px;overflow:hidden}
+.sbar-f{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+
+/* ALERTS & PENDING */
+.alert-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.alert-item:last-child{border-bottom:none}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.adot.r{background:var(--rd);box-shadow:0 0 5px var(--rd)}.adot.a{background:var(--am);box-shadow:0 0 4px var(--am)}.adot.g{background:var(--gn)}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)}
+.prow:last-child{border-bottom:none}
+
+/* STORE MINI (dashboard util) */
+.store-mini{background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:11px 13px;margin-bottom:8px}
+.store-mini:last-child{margin-bottom:0}
+.sm-name{font-size:13px;font-weight:500;margin-bottom:1px}
+.sm-meta{font-size:11px;color:var(--tx2);margin-bottom:8px}
+.utrack{height:5px;background:var(--bd);border-radius:99px;overflow:hidden;margin-bottom:4px}
+.ufill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.ulb{display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)}
+
+/* FORMS */
+.fr{display:grid;gap:12px;margin-bottom:12px}
+.fr.c2{grid-template-columns:1fr 1fr}
+.fg{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:5px}
+input,select{width:100%;padding:8px 10px;font-size:13px;font-family:inherit;border:1px solid var(--bd);border-radius:var(--r2);background:var(--bgi);color:var(--tx);transition:border-color var(--tr),box-shadow var(--tr);outline:none}
+input:focus,select:focus{border-color:var(--bdf);box-shadow:0 0 0 3px var(--bl1)}
+input::placeholder{color:var(--tx3)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B949E' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+[data-theme=light] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23656D76' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")}
+.hint{font-size:11px;color:var(--tx2);margin-top:4px}
+.prev-box{background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:12px;margin-bottom:10px;line-height:1.9}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;font-size:12.5px;font-family:inherit;font-weight:500;border:1px solid var(--bd);border-radius:var(--r2);background:var(--bgc);color:var(--tx);cursor:pointer;transition:all var(--tr);white-space:nowrap;user-select:none}
+.btn:hover{background:var(--bgh)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--acc);color:#0D1117;border-color:var(--acc);font-weight:600}
+.btn-p:hover{opacity:.88;background:var(--acc)}
+.btn-d{color:var(--rd);border-color:transparent}
+.btn-d:hover{background:var(--rd1);border-color:var(--rd1)}
+.btn-sm{padding:4px 9px;font-size:11.5px}
+.btn-icon{padding:5px 7px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:500;white-space:nowrap}
+.bg{background:var(--gn1);color:var(--gn)}.ba{background:var(--am1);color:var(--am)}.br{background:var(--rd1);color:var(--rd)}.bb{background:var(--bl1);color:var(--bl)}.bk{background:var(--bgh);color:var(--tx2)}.bacc{background:var(--acc1);color:var(--acc)}
+
+/* TABLES */
+.tbl-outer{overflow-x:auto}
+table{border-collapse:collapse;font-size:13px;width:100%}
+th{text-align:left;padding:8px 11px;font-size:10.5px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--bd);white-space:nowrap;background:var(--bgc)}
+td{padding:9px 11px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bgh)}
+tr.tot-row td{background:var(--bgh);font-weight:600;border-top:1px solid var(--bd)}
+th.mhd{min-width:88px;background:var(--bgh)}
+th.shd{text-align:center;min-width:115px;border-left:1px solid var(--bd);text-transform:none;letter-spacing:0;font-size:11.5px}
+th.thd{text-align:center;border-left:1px solid var(--bd);background:var(--bgh)}
+td.mc{background:var(--bgh);font-weight:500;white-space:nowrap;border-right:1px solid var(--bd)}
+td.sc{text-align:center;border-left:1px solid var(--bd)}
+td.tc{text-align:center;border-left:1px solid var(--bd);background:var(--bgh);font-weight:600}
+.cv{font-size:13px;font-weight:600}
+.cs{font-size:10px;color:var(--tx2);margin-top:1px}
+.cb{color:var(--tx3);font-size:11px}
+
+/* SEARCH */
+.sw{position:relative;margin-bottom:12px}
+.sw i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px;pointer-events:none}
+.si-inp{width:100%;padding:8px 10px 8px 34px;font-size:13px;font-family:inherit;border:1px solid var(--bd);border-radius:var(--r2);background:var(--bgi);color:var(--tx);outline:none;transition:border-color var(--tr),box-shadow var(--tr)}
+.si-inp:focus{border-color:var(--bdf);box-shadow:0 0 0 3px var(--bl1)}
+.si-inp::placeholder{color:var(--tx3)}
+
+/* TOAST */
+.tw{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.tst{display:flex;align-items:center;gap:8px;padding:10px 15px;background:var(--tx);color:var(--bg);border-radius:var(--r3);font-size:13px;font-weight:500;box-shadow:var(--shl);transform:translateX(130%);transition:transform .28s cubic-bezier(.4,0,.2,1);pointer-events:auto;max-width:320px}
+.tst.show{transform:translateX(0)}
+.t-undo{color:var(--acc);background:none;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;padding:0;margin-left:2px;flex-shrink:0}
+.t-undo:hover{text-decoration:underline}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-ov.open{display:flex}
+.modal{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r4);width:100%;max-width:620px;max-height:88vh;overflow-y:auto;animation:mIn .18s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bgc);z-index:1}
+.mh h3{font-size:15px;font-weight:600}
+.mb{padding:20px}
+.mf{padding:12px 20px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end}
+
+/* STORE CARDS */
+.scard{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:10px;transition:border-color var(--tr)}
+.scard:hover{border-color:var(--bdf)}
+.scard:last-child{margin-bottom:0}
+.scard .ev{display:flex;align-items:center;gap:10px}
+.scard .ef{display:none;padding-top:10px}
+.scard.editing .ev{display:none}
+.scard.editing .ef{display:block}
+.savatar{width:38px;height:38px;border-radius:50%;background:var(--acc1);border:1px solid var(--acc2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--acc);flex-shrink:0}
+
+/* CHART */
+.chart-wrap{position:relative;height:210px}
+.chart-wrap.tall{height:290px}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 16px;color:var(--tx2)}
+.empty i{font-size:28px;margin-bottom:8px;display:block;opacity:.3}
+.empty p{font-size:13px}
+
+/* TABS */
+.tab-bar{display:flex;gap:2px;border-bottom:1px solid var(--bd);margin-bottom:16px}
+.tab{padding:8px 14px;font-size:13px;font-family:inherit;font-weight:500;border:none;background:none;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--tr);display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--tx)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* STEPS */
+.step-list{list-style:none}
+.step-list li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px;color:var(--tx2)}
+.step-list li:last-child{border-bottom:none}
+.sn{min-width:22px;height:22px;border-radius:50%;background:var(--bgh);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--tx2)}
+
+/* MISC */
+.row{display:flex;align-items:center;gap:8px}
+.row.sb{justify-content:space-between}
+hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
+
+/* PRINT */
+@media print{
+  .nav,.tw,.modal-ov,.tab-bar,button,.btn{display:none!important}
+  .page{display:none!important}
+  #page-reports.active{display:block!important;padding:0}
+  body{background:#fff;color:#000}
+  .card{border:1px solid #ccc;box-shadow:none}
+  table{font-size:11px}
+  th,td{border:1px solid #ccc;padding:5px 8px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOASTS -->
+<div class="tw" id="tw"></div>
+
+<!-- STORE DETAIL MODAL -->
+<div class="modal-ov" id="modal-store" onclick="if(event.target===this)closeModal('modal-store')">
+  <div class="modal">
+    <div class="mh">
+      <h3 id="modal-title">Store Detail</h3>
+      <button class="btn btn-icon" onclick="closeModal('modal-store')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mb" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="brand-ico"><i class="ti ti-diamond"></i></div>
+    <span>Kisna MDF</span>
+  </div>
+  <button class="nb active" data-page="dashboard" onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
+  <button class="nb" data-page="stores" onclick="nav('stores')"><i class="ti ti-building-store"></i><span>Stores</span></button>
+  <button class="nb" data-page="inventory" onclick="nav('inventory')"><i class="ti ti-package"></i><span>Inventory</span></button>
+  <button class="nb" data-page="expenses" onclick="nav('expenses')"><i class="ti ti-receipt"></i><span>Expenses</span></button>
+  <button class="nb" data-page="reports" onclick="nav('reports')"><i class="ti ti-table"></i><span>Reports</span></button>
+  <div class="nav-r">
+    <span class="sync-pill" id="sync-pill"><span class="dot"></span>Local</span>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme"><i class="ti ti-sun" id="theme-icon"></i></button>
+    <button class="btn btn-sm" onclick="nav('settings')"><i class="ti ti-settings"></i><span>Sheets</span></button>
+  </div>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="g4" id="stat-row"></div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-chart-bar"></i>Store utilisation</div>
+      <div class="chart-wrap"><canvas id="dash-chart"></canvas></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="ct"><i class="ti ti-alert-triangle" style="color:var(--am)"></i>Alerts</div>
+        <div id="dash-alerts"></div>
+      </div>
+      <div class="card mb0">
+        <div class="ct"><i class="ti ti-clock" style="color:var(--bl)"></i>Pending this month</div>
+        <div id="dash-pending"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb0">
+    <div class="ct"><i class="ti ti-building-store"></i>All stores</div>
+    <div class="sw"><i class="ti ti-search"></i><input class="si-inp" id="dash-search" placeholder="Search stores…" oninput="dashQ=this.value;renderDashTable(dashQ)"></div>
+    <div class="tbl-outer"><table>
+      <thead><tr><th>Store</th><th>City</th><th>Opening</th><th>Phase</th><th>Pool</th><th>Used</th><th>Balance</th><th>Utilisation</th><th></th></tr></thead>
+      <tbody id="dash-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page">
+  <div class="card" style="max-width:540px">
+    <div class="ct"><i class="ti ti-brand-google"></i>Connect to Google Sheets</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:14px;line-height:1.7">Paste your Apps Script Web App URL. Once connected, data syncs directly to your Sheet and persists forever.</p>
+    <div class="fg">
+      <label>Apps Script Web App URL</label>
+      <input id="sheet-url" placeholder="https://script.google.com/macros/s/.../exec">
+      <div class="hint">Extensions → Apps Script → Deploy → New deployment in your Google Sheet</div>
+    </div>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn btn-p" onclick="connectSheets()"><i class="ti ti-plug"></i>Connect &amp; sync</button>
+      <button class="btn btn-d" onclick="disconnectSheets()"><i class="ti ti-plug-x"></i>Disconnect</button>
+    </div>
+    <div id="connect-status"></div>
+    <hr class="dv">
+    <div class="ct" style="margin-bottom:8px"><i class="ti ti-file-code"></i>Setup instructions</div>
+    <ol class="step-list">
+      <li><span class="sn">1</span><span>Download the <strong>KisnaMDF_GoogleAppsScript.js</strong> file</span></li>
+      <li><span class="sn">2</span><span>Open a new Google Sheet → Extensions → Apps Script</span></li>
+      <li><span class="sn">3</span><span>Paste the entire script and save (Ctrl+S)</span></li>
+      <li><span class="sn">4</span><span>Click Deploy → New deployment → Type: Web App</span></li>
+      <li><span class="sn">5</span><span>Set access to <strong>"Anyone"</strong> → Deploy → copy URL</span></li>
+      <li><span class="sn">6</span><span>Paste the URL above and click Connect &amp; sync</span></li>
+    </ol>
+  </div>
+</div>
+
+<!-- STORES -->
+<div id="page-stores" class="page">
+  <div class="g2">
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-plus"></i>Add new store</div>
+      <div class="fr c2">
+        <div><label>Store name</label><input id="st-name" placeholder="Kisna Andheri"></div>
+        <div><label>City</label><input id="st-city" placeholder="Mumbai"></div>
+      </div>
+      <div class="fr c2">
+        <div><label>Owner</label><input id="st-owner" placeholder="Name"></div>
+        <div><label>Phone</label><input id="st-phone" placeholder="+91…"></div>
+      </div>
+      <div class="fg"><label>Opening month</label><input id="st-open" type="month"></div>
+      <button class="btn btn-p" onclick="addStore()"><i class="ti ti-plus"></i>Add store</button>
+    </div>
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-list"></i>Store directory</div>
+      <div class="sw"><i class="ti ti-search"></i><input class="si-inp" placeholder="Search…" oninput="renderStoreDir(this.value)"></div>
+      <div id="store-dir"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div id="page-inventory" class="page">
+  <div class="g2">
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-package"></i>Log inventory purchase</div>
+      <div class="fg"><label>Store</label><select id="inv-store"><option value="">Select store</option></select></div>
+      <div class="fr c2">
+        <div><label>Purchase month</label><input id="inv-month" type="month"></div>
+        <div><label>Type</label><select id="inv-type"><option value="opening">Opening</option><option value="reorder">Reorder</option></select></div>
+      </div>
+      <div class="fg">
+        <label>Inventory value (₹)</label>
+        <input id="inv-val" type="number" placeholder="e.g. 5000000" oninput="previewBudget()">
+        <div class="hint" id="inv-preview"></div>
+      </div>
+      <div class="fg"><label>Notes (optional)</label><input id="inv-notes" placeholder="e.g. Grand opening stock"></div>
+      <button class="btn btn-p" onclick="addInventory()"><i class="ti ti-check"></i>Log purchase</button>
+    </div>
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-history"></i>Purchase history</div>
+      <div class="tbl-outer"><table>
+        <thead><tr><th>Store</th><th>Month</th><th>Type</th><th>Value</th><th>Budget added</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="inv-tbody"></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div id="page-expenses" class="page">
+  <div class="g2">
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-receipt"></i>Log marketing expense</div>
+      <div class="fr c2">
+        <div><label>Store</label><select id="exp-store" onchange="updateExpPrev()"><option value="">Select store</option></select></div>
+        <div><label>Month</label><input id="exp-month" type="month" onchange="updateExpPrev()"></div>
+      </div>
+      <div id="exp-info" style="margin-bottom:8px"></div>
+      <div class="fg">
+        <label>Actual spend (₹)</label>
+        <input id="exp-amt" type="number" placeholder="Total amount spent this month" oninput="updateExpPrev()">
+      </div>
+      <div id="exp-preview" style="margin-bottom:10px"></div>
+      <div class="fg"><label>Channel / description</label><input id="exp-desc" placeholder="e.g. Meta ads, Hoardings, Google"></div>
+      <button class="btn btn-p" onclick="addExpense()"><i class="ti ti-check"></i>Log expense</button>
+    </div>
+    <div class="card mb0">
+      <div class="ct"><i class="ti ti-list"></i>Expense log</div>
+      <div class="sw"><i class="ti ti-search"></i><input class="si-inp" placeholder="Search store…" oninput="renderExpenses(this.value)"></div>
+      <div class="tbl-outer" id="exp-log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div id="page-reports" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+      <div><label>From</label><input id="rpt-from" type="month" style="width:126px"></div>
+      <div><label>To</label><input id="rpt-to" type="month" style="width:126px"></div>
+      <div><label>Show</label><select id="rpt-mode" style="width:155px" onchange="renderMatrix()">
+        <option value="used">Allowance used</option>
+        <option value="actual">Actual spend</option>
+        <option value="balance">Running balance</option>
+        <option value="both">Used + balance</option>
+      </select></div>
+      <div style="display:flex;align-items:center;gap:6px;padding-bottom:1px">
+        <input type="checkbox" id="rpt-total" style="width:auto" onchange="renderMatrix()">
+        <label style="display:inline;margin:0;cursor:pointer">Totals row</label>
+      </div>
+      <button class="btn btn-p" onclick="renderMatrix()"><i class="ti ti-refresh"></i>Refresh</button>
+      <button class="btn" onclick="exportCSV()"><i class="ti ti-download"></i>CSV</button>
+      <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i>Print</button>
+    </div>
+  </div>
+  <div class="card mb0">
+    <div class="tab-bar">
+      <button class="tab active" id="tab-tbl" onclick="switchTab('table')"><i class="ti ti-table"></i>Table</button>
+      <button class="tab" id="tab-cht" onclick="switchTab('chart')"><i class="ti ti-chart-bar"></i>Chart</button>
+    </div>
+    <div class="ct" id="matrix-title"><i class="ti ti-table"></i>Month × store matrix</div>
+    <div id="rpt-table"><div class="tbl-outer" id="matrix-wrap"></div></div>
+    <div id="rpt-chart" style="display:none"><div class="chart-wrap tall"><canvas id="report-chart"></canvas></div></div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS & STATE ──
+const DB_KEY='kisna_mdf_v4',SH_KEY='kisna_sh_url',TH_KEY='kisna_theme';
+let db={stores:{},inventory:[],expenses:[]};
+let sheetsUrl='',sheetsConnected=false;
+let undoStack=null,dashChart=null,reportChart=null;
+let dashQ='',rptTab='table';
+let lastMatrix={stores:[],months:[],mode:'used'};
+let curPage='dashboard';
+
+// ── localStorage ──
+const ls={
+  get:k=>{try{return localStorage.getItem(k)}catch{return null}},
+  set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}},
+  del:k=>{try{localStorage.removeItem(k)}catch{}}
+};
+function saveLocal(){ls.set(DB_KEY,JSON.stringify(db));}
+
+// ── SEED DATA ──
+function seed(){
+  db.stores={
+    's1':{id:'s1',name:'Kisna Andheri',city:'Mumbai',owner:'Rahul Shah',phone:'9876543210',openingMonth:'2025-02'},
+    's2':{id:'s2',name:'Kisna Thane',city:'Thane',owner:'Priya Mehta',phone:'9812345678',openingMonth:'2025-05'},
+    's3':{id:'s3',name:'Kisna Pune CP',city:'Pune',owner:'Amit Kulkarni',phone:'9900112233',openingMonth:'2024-11'},
+    's4':{id:'s4',name:'Kisna Hyderabad',city:'Hyderabad',owner:'Suresh Reddy',phone:'9988776655',openingMonth:'2026-04'}
+  };
+  db.inventory=[
+    {id:'i1',storeId:'s1',month:'2025-02',type:'opening',value:5000000,budget:50000,notes:'Grand opening'},
+    {id:'i2',storeId:'s2',month:'2025-05',type:'opening',value:3000000,budget:30000,notes:''},
+    {id:'i3',storeId:'s3',month:'2024-11',type:'opening',value:7000000,budget:70000,notes:''},
+    {id:'i4',storeId:'s3',month:'2025-04',type:'reorder',value:2000000,budget:20000,notes:'Akshay Tritiya'},
+    {id:'i5',storeId:'s1',month:'2025-08',type:'reorder',value:3000000,budget:30000,notes:'Festive'},
+    {id:'i6',storeId:'s4',month:'2026-04',type:'opening',value:50000000,budget:500000,notes:'New store'}
+  ];
+  db.expenses=[
+    {id:'e1',storeId:'s1',month:'2025-02',actual:90000,cap:100000,used:50000,desc:'Meta + hoardings'},
+    {id:'e2',storeId:'s1',month:'2025-03',actual:75000,cap:100000,used:50000,desc:'Google ads'},
+    {id:'e3',storeId:'s1',month:'2025-04',actual:40000,cap:100000,used:40000,desc:'Local events'},
+    {id:'e4',storeId:'s1',month:'2025-05',actual:30000,cap:50000,used:30000,desc:'Meta'},
+    {id:'e5',storeId:'s2',month:'2025-05',actual:95000,cap:100000,used:30000,desc:'Opening event'},
+    {id:'e6',storeId:'s2',month:'2025-06',actual:50000,cap:100000,used:30000,desc:'Instagram'},
+    {id:'e7',storeId:'s3',month:'2024-11',actual:100000,cap:100000,used:70000,desc:'Opening campaign'},
+    {id:'e8',storeId:'s3',month:'2024-12',actual:80000,cap:100000,used:50000,desc:'Year end push'},
+    {id:'e9',storeId:'s3',month:'2025-01',actual:50000,cap:100000,used:50000,desc:'New Year ads'},
+    {id:'e10',storeId:'s4',month:'2026-04',actual:100000,cap:100000,used:100000,desc:'Grand launch'},
+    {id:'e11',storeId:'s4',month:'2026-05',actual:75000,cap:100000,used:75000,desc:'Follow-up campaign'}
+  ];
+  saveLocal();
+}
+
+// ── UTILS ──
+function uid(){return Math.random().toString(36).slice(2,9)}
+function fmt(n){n=Math.round(n);if(n>=10000000)return'₹'+(n/10000000).toFixed(2)+'Cr';if(n>=100000)return'₹'+(n/100000).toFixed(2)+'L';if(n>=1000)return'₹'+(n/1000).toFixed(1)+'K';return'₹'+n;}
+function mLabel(m){if(!m)return'—';const[y,mo]=m.split('-').map(Number);return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+' '+y;}
+function mShort(m){if(!m)return'—';const[y,mo]=m.split('-').map(Number);return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+" '"+(y%100).toString().padStart(2,'0');}
+function addM(m,n){let[y,mo]=m.split('-').map(Number);mo+=n;while(mo>12){mo-=12;y++}while(mo<1){mo+=12;y--}return y+'-'+String(mo).padStart(2,'0');}
+function mDiff(a,b){const[ay,am]=a.split('-').map(Number);const[by,bm]=b.split('-').map(Number);return(by-ay)*12+(bm-am);}
+function nowM(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// ── THEME ──
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  applyTheme(t);ls.set(TH_KEY,t);
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const ic=document.getElementById('theme-icon');
+  if(ic)ic.className=t==='dark'?'ti ti-sun':'ti ti-moon';
+}
+
+// ── TOAST ──
+function toast(msg,undoFn){
+  const wrap=document.getElementById('tw');
+  const el=document.createElement('div');
+  el.className='tst';
+  el.innerHTML=`<i class="ti ti-check" style="font-size:14px;flex-shrink:0"></i><span style="flex:1">${msg}</span>${undoFn?'<button class="t-undo" onclick="doUndo()">Undo</button>':''}`;
+  wrap.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  if(undoFn)undoStack={fn:undoFn,el};
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),320);if(undoStack?.el===el)undoStack=null;},5000);
+}
+function doUndo(){
+  if(!undoStack)return;
+  undoStack.fn();
+  undoStack.el.classList.remove('show');
+  setTimeout(()=>undoStack?.el?.remove(),320);
+  undoStack=null;
+}
+
+// ── MDF LOGIC ──
+function storePool(sid){return db.inventory.filter(i=>i.storeId===sid).reduce((a,i)=>a+(+i.budget),0);}
+function storeUsed(sid){return db.expenses.filter(e=>e.storeId===sid).reduce((a,e)=>a+(+e.used),0);}
+function storeBal(sid){return storePool(sid)-storeUsed(sid);}
+function getPhase(sid,month){
+  const open=db.stores[sid]?.openingMonth;if(!open)return null;
+  const d=mDiff(open,month);if(d<0)return null;
+  if(d<3)return{cap:100000,label:'Opening '+(d+1)+'/3',badge:'bg'};
+  return{cap:50000,label:'Regular',badge:'bk'};
+}
+function runBal(sid,upToMonth){
+  return storePool(sid)-db.expenses.filter(e=>e.storeId===sid&&e.month<=upToMonth).reduce((a,e)=>a+(+e.used),0);
+}
+
+// ── SHEETS ──
+async function apiCall(body){const r=await fetch(sheetsUrl,{method:'POST',body:JSON.stringify(body)});return r.json();}
+async function syncFromSheets(){
+  if(!sheetsUrl)return;
+  try{
+    const data=await apiCall({action:'getAll'});
+    if(data.error)throw new Error(data.error);
+    db=data;sheetsConnected=true;saveLocal();updateSyncPill(true);renderPage(curPage);
+    toast('Synced from Google Sheets');
+  }catch(e){
+    sheetsConnected=false;updateSyncPill(false);
+    document.getElementById('connect-status').innerHTML=`<span style="color:var(--rd);font-size:12px">Connection failed: ${e.message}</span>`;
+  }
+}
+async function connectSheets(){
+  sheetsUrl=document.getElementById('sheet-url').value.trim();
+  if(!sheetsUrl){toast('Paste your Apps Script URL first');return;}
+  ls.set(SH_KEY,sheetsUrl);
+  document.getElementById('connect-status').innerHTML='<span style="color:var(--bl);font-size:12px">Connecting…</span>';
+  await syncFromSheets();
+  if(sheetsConnected)document.getElementById('connect-status').innerHTML='<span style="color:var(--gn);font-size:12px">Connected! Data syncs automatically.</span>';
+}
+function disconnectSheets(){
+  sheetsUrl='';sheetsConnected=false;ls.del(SH_KEY);
+  document.getElementById('sheet-url').value='';
+  document.getElementById('connect-status').innerHTML='<span style="font-size:12px;color:var(--tx2)">Disconnected — local mode.</span>';
+  updateSyncPill(false);toast('Disconnected from Sheets');
+}
+function updateSyncPill(ok){
+  const el=document.getElementById('sync-pill');
+  el.innerHTML=`<span class="dot"></span>${ok?'Sheets':'Local'}`;
+  el.className='sync-pill'+(ok?' ok':'');
+}
+async function sheetsSave(action,body){
+  saveLocal();
+  if(sheetsConnected){try{await apiCall({action,...body});}catch{toast('Sheets sync failed — saved locally');}}
+}
+
+// ── NAV ──
+function nav(p){
+  curPage=p;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.querySelectorAll('[data-page="'+p+'"]').forEach(el=>el.classList.add('active'));
+  refreshDropdowns();renderPage(p);
+}
+function renderPage(p){
+  switch(p){
+    case 'dashboard':renderDashboard();break;
+    case 'stores':renderStoreDir();break;
+    case 'inventory':renderInvTable();break;
+    case 'expenses':renderExpenses();break;
+    case 'reports':renderMatrix();break;
+  }
+}
+function refreshDropdowns(){
+  const stores=Object.values(db.stores).sort((a,b)=>a.name.localeCompare(b.name));
+  ['inv-store','exp-store'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML='<option value="">Select store</option>'+stores.map(s=>`<option value="${s.id}"${s.id===cur?' selected':''}>${esc(s.name)}</option>`).join('');
+  });
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const stores=Object.values(db.stores);
+  const totalPool=stores.reduce((a,s)=>a+storePool(s.id),0);
+  const totalUsed=stores.reduce((a,s)=>a+storeUsed(s.id),0);
+  const totalBal=Math.max(0,totalPool-totalUsed);
+  const pct=totalPool?Math.round(totalUsed/totalPool*100):0;
+  const active=stores.filter(s=>storePool(s.id)>0&&storeBal(s.id)>0).length;
+  const m=nowM();
+
+  document.getElementById('stat-row').innerHTML=`
+    <div class="stat-card sc-bl"><div class="si bl"><i class="ti ti-building-store"></i></div><div class="sl">Total stores</div><div class="sv">${stores.length}</div><div class="ss">${active} active with balance</div><div class="sbar"><div class="sbar-f" style="background:var(--bl);width:${stores.length?Math.round(active/stores.length*100):0}%"></div></div></div>
+    <div class="stat-card sc-bl"><div class="si bl"><i class="ti ti-coins"></i></div><div class="sl">Total MDF pool</div><div class="sv">${fmt(totalPool)}</div><div class="ss">1% of all inventory value</div><div class="sbar"><div class="sbar-f" style="background:var(--bl);width:100%"></div></div></div>
+    <div class="stat-card sc-am"><div class="si am"><i class="ti ti-cash"></i></div><div class="sl">Total utilised</div><div class="sv" style="color:var(--am)">${fmt(totalUsed)}</div><div class="ss">${pct}% of pool consumed</div><div class="sbar"><div class="sbar-f" style="background:${pct>85?'var(--rd)':'var(--am)'};width:${pct}%"></div></div></div>
+    <div class="stat-card sc-gn"><div class="si gn"><i class="ti ti-wallet"></i></div><div class="sl">Total balance</div><div class="sv" style="color:var(--gn)">${fmt(totalBal)}</div><div class="ss">${100-pct}% remaining</div><div class="sbar"><div class="sbar-f" style="background:var(--gn);width:${100-pct}%"></div></div></div>`;
+
+  renderDashChart(stores);
+
+  const alerts=stores.filter(s=>storePool(s.id)===0||storeBal(s.id)<=0||storeBal(s.id)<50000);
+  document.getElementById('dash-alerts').innerHTML=alerts.length?alerts.map(s=>{
+    const bal=Math.max(0,storeBal(s.id)),pool=storePool(s.id);
+    const dc=pool===0||bal<=0?'r':'a';
+    const msg=pool===0?'No inventory logged':bal<=0?'Budget exhausted':'Low balance';
+    return`<div class="alert-item"><div class="adot ${dc}"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--tx2)">${msg} · ${fmt(bal)} left</div></div><span class="badge ${dc==='r'?'br':'ba'}">${dc==='r'?'Critical':'Low'}</span></div>`;
+  }).join(''):'<div class="empty" style="padding:14px"><i class="ti ti-circle-check" style="font-size:22px;color:var(--gn);opacity:1"></i><p style="color:var(--gn)">All stores healthy</p></div>';
+
+  const pending=stores.filter(s=>{const ph=getPhase(s.id,m);return ph&&storeBal(s.id)>0&&!db.expenses.find(e=>e.storeId===s.id&&e.month===m);});
+  document.getElementById('dash-pending').innerHTML=pending.length?pending.map(s=>{
+    const ph=getPhase(s.id,m);
+    return`<div class="prow"><div><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--tx2)">${ph.label} · cap ${fmt(ph.cap)}</div></div><span class="badge bb">Pending</span></div>`;
+  }).join(''):`<div class="empty" style="padding:14px"><i class="ti ti-circle-check" style="font-size:22px;color:var(--gn);opacity:1"></i><p style="color:var(--gn)">All logged for ${mLabel(m)}</p></div>`;
+
+  renderDashTable(dashQ);
+}
+
+function renderDashChart(stores){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gc=dark?'rgba(48,54,61,.7)':'rgba(208,215,222,.7)';
+  const tc=dark?'#8B949E':'#656D76';
+  if(dashChart){dashChart.destroy();dashChart=null;}
+  const ctx=document.getElementById('dash-chart')?.getContext('2d');
+  if(!ctx||!stores.length)return;
+  const labels=stores.map(s=>s.name.replace('Kisna ',''));
+  const pcts=stores.map(s=>{const p=storePool(s.id);return p?Math.round(storeUsed(s.id)/p*100):0;});
+  const clrs=pcts.map(p=>p>85?'#F85149':p>60?'#D29922':'#3FB950');
+  dashChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[{label:'Utilisation %',data:pcts,backgroundColor:clrs.map(c=>c+'28'),borderColor:clrs,borderWidth:1.5,borderRadius:5,barThickness:26}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.x}% used`}}},
+      scales:{x:{min:0,max:100,grid:{color:gc},ticks:{color:tc,callback:v=>v+'%'},border:{color:gc}},y:{grid:{display:false},ticks:{color:tc,font:{size:12}},border:{display:false}}}}
+  });
+}
+
+function renderDashTable(q){
+  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase()));
+  const m=nowM();
+  document.getElementById('dash-tbody').innerHTML=stores.map(s=>{
+    const pool=storePool(s.id),used=storeUsed(s.id),bal=Math.max(0,pool-used);
+    const pct=pool?Math.round(used/pool*100):0;
+    const bc=pct>85?'var(--rd)':pct>60?'var(--am)':'var(--gn)';
+    const ph=getPhase(s.id,m);
+    return`<tr>
+      <td><strong style="cursor:pointer;color:var(--acc)" onclick="openStoreModal('${s.id}')">${s.name}</strong></td>
+      <td style="color:var(--tx2)">${s.city||'—'}</td>
+      <td>${mLabel(s.openingMonth)}</td>
+      <td>${ph?`<span class="badge ${ph.badge}">${ph.label}</span>`:'<span class="badge bk">Pre-launch</span>'}</td>
+      <td>${fmt(pool)}</td><td>${fmt(used)}</td>
+      <td><strong>${fmt(bal)}</strong></td>
+      <td><div style="display:flex;align-items:center;gap:7px;min-width:90px"><span style="font-size:12px;font-weight:500;min-width:30px">${pct}%</span><div style="flex:1;height:5px;background:var(--bgh);border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min(100,pct)}%;background:${bc};border-radius:99px;transition:width .6s ease"></div></div></div></td>
+      <td><button class="btn btn-sm btn-icon" onclick="openStoreModal('${s.id}')"><i class="ti ti-eye"></i></button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--tx2)">No stores found</td></tr>';
+}
+
+// ── STORE MODAL ──
+function openStoreModal(sid){
+  const s=db.stores[sid];if(!s)return;
+  const pool=storePool(sid),used=storeUsed(sid),bal=Math.max(0,pool-used);
+  const m=nowM(),ph=getPhase(sid,m);
+  const pct=pool?Math.round(used/pool*100):0;
+  const invRows=db.inventory.filter(i=>i.storeId===sid).sort((a,b)=>b.month.localeCompare(a.month));
+  const expRows=db.expenses.filter(e=>e.storeId===sid).sort((a,b)=>b.month.localeCompare(a.month));
+  document.getElementById('modal-title').textContent=s.name;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">MDF Pool</div><div style="font-size:20px;font-weight:700;color:var(--bl)">${fmt(pool)}</div></div>
+      <div style="background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Used</div><div style="font-size:20px;font-weight:700;color:var(--am)">${fmt(used)}</div></div>
+      <div style="background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Balance</div><div style="font-size:20px;font-weight:700;color:var(--gn)">${fmt(bal)}</div></div>
+    </div>
+    <div style="background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 14px;margin-bottom:14px">
+      <div style="height:6px;background:var(--bd);border-radius:99px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${Math.min(100,pct)}%;background:${pct>85?'var(--rd)':pct>60?'var(--am)':'var(--gn)'};border-radius:99px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>${pct}% utilised</span><span>${ph?`<span class="badge ${ph.badge}">${ph.label}</span>`:'—'}</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:16px;color:var(--tx2)">
+      <div>City: <span style="color:var(--tx)">${s.city||'—'}</span></div>
+      <div>Owner: <span style="color:var(--tx)">${s.owner||'—'}</span></div>
+      <div>Phone: <span style="color:var(--tx)">${s.phone||'—'}</span></div>
+      <div>Opening: <span style="color:var(--tx)">${mLabel(s.openingMonth)}</span></div>
+    </div>
+    <hr class="dv">
+    <div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Inventory history</div>
+    ${invRows.length?`<div class="tbl-outer" style="margin-bottom:16px"><table><thead><tr><th>Month</th><th>Type</th><th>Value</th><th>Budget</th><th>Notes</th></tr></thead><tbody>${invRows.map(i=>`<tr><td>${mLabel(i.month)}</td><td><span class="badge ${i.type==='opening'?'bg':'ba'}">${i.type}</span></td><td>${fmt(i.value)}</td><td><strong>${fmt(i.budget)}</strong></td><td style="color:var(--tx2)">${i.notes||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p style="color:var(--tx2);font-size:13px;margin-bottom:16px">No inventory logged</p>'}
+    <div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Expense history</div>
+    ${expRows.length?`<div class="tbl-outer"><table><thead><tr><th>Month</th><th>Actual</th><th>Used (MDF)</th><th>Saved</th><th>Description</th></tr></thead><tbody>${expRows.map(e=>{const sv=Math.max(0,e.actual-e.used);return`<tr><td>${mLabel(e.month)}</td><td>${fmt(e.actual)}</td><td><strong>${fmt(e.used)}</strong></td><td>${sv>0?`<span class="badge bg">${fmt(sv)}</span>`:'—'}</td><td style="color:var(--tx2)">${e.desc||'—'}</td></tr>`;}).join('')}</tbody></table></div>`:'<p style="color:var(--tx2);font-size:13px">No expenses logged</p>'}
+  `;
+  document.getElementById('modal-store').classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── STORES CRUD ──
+async function addStore(){
+  const name=document.getElementById('st-name').value.trim();
+  const city=document.getElementById('st-city').value.trim();
+  const owner=document.getElementById('st-owner').value.trim();
+  const phone=document.getElementById('st-phone').value.trim();
+  const open=document.getElementById('st-open').value;
+  if(!name||!open){toast('Store name and opening month are required');return;}
+  const id=uid(),store={id,name,city,owner,phone,openingMonth:open};
+  db.stores[id]=store;
+  await sheetsSave('addStore',store);
+  refreshDropdowns();renderStoreDir();renderDashboard();
+  ['st-name','st-city','st-owner','st-phone'].forEach(i=>document.getElementById(i).value='');
+  toast('Store added'+(sheetsConnected?' · Sheets':' · local'));
+}
+async function deleteStore(sid){
+  if(!confirm(`Delete "${db.stores[sid]?.name}" and all its data?`))return;
+  const snap=JSON.parse(JSON.stringify(db));
+  delete db.stores[sid];
+  db.inventory=db.inventory.filter(i=>i.storeId!==sid);
+  db.expenses=db.expenses.filter(e=>e.storeId!==sid);
+  await sheetsSave('deleteStore',{id:sid});
+  refreshDropdowns();renderStoreDir();renderDashboard();
+  toast('Store deleted',()=>{db=snap;saveLocal();refreshDropdowns();renderStoreDir();renderDashboard();toast('Undo successful');});
+}
+function renderStoreDir(q=''){
+  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('store-dir').innerHTML=stores.length?stores.map(s=>{
+    const bal=Math.max(0,storeBal(s.id)),pool=storePool(s.id);
+    const ini=s.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const pct=pool?Math.round(storeUsed(s.id)/pool*100):0;
+    const bc=pct>85?'var(--rd)':pct>60?'var(--am)':'var(--gn)';
+    return`<div class="scard" id="sc-${s.id}">
+      <div class="ev">
+        <div class="savatar">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:13px;cursor:pointer" onclick="openStoreModal('${s.id}')">${s.name}</div>
+          <div style="font-size:11px;color:var(--tx2)">${s.city||''}${s.owner?' · '+s.owner:''} · ${mLabel(s.openingMonth)}</div>
+          <div style="margin-top:6px"><div class="utrack"><div class="ufill" style="width:${Math.min(100,pct)}%;background:${bc}"></div></div>
+          <div class="ulb"><span>${pct}% used</span><span>${fmt(bal)} left of ${fmt(pool)}</span></div></div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="btn btn-sm btn-icon" onclick="startEdit('${s.id}')"><i class="ti ti-pencil"></i></button>
+          <button class="btn btn-sm btn-icon btn-d" onclick="deleteStore('${s.id}')"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+      <div class="ef">
+        <div class="fr c2" style="margin-top:10px">
+          <div><label>Store name</label><input id="ef-n-${s.id}" value="${esc(s.name)}"></div>
+          <div><label>City</label><input id="ef-c-${s.id}" value="${esc(s.city||'')}"></div>
+        </div>
+        <div class="fr c2">
+          <div><label>Owner</label><input id="ef-o-${s.id}" value="${esc(s.owner||'')}"></div>
+          <div><label>Phone</label><input id="ef-p-${s.id}" value="${esc(s.phone||'')}"></div>
+        </div>
+        <div class="fg"><label>Opening month</label><input type="month" id="ef-m-${s.id}" value="${s.openingMonth||''}"></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p btn-sm" onclick="saveEdit('${s.id}')"><i class="ti ti-check"></i>Save</button>
+          <button class="btn btn-sm" onclick="cancelEdit('${s.id}')"><i class="ti ti-x"></i>Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  }).join(''):'<div class="empty"><i class="ti ti-building-store"></i><p>No stores yet — add one!</p></div>';
+}
+function startEdit(sid){document.getElementById('sc-'+sid)?.classList.add('editing');}
+function cancelEdit(sid){document.getElementById('sc-'+sid)?.classList.remove('editing');}
+async function saveEdit(sid){
+  const g=id=>document.getElementById(id)?.value.trim();
+  const name=g(`ef-n-${sid}`),city=g(`ef-c-${sid}`),owner=g(`ef-o-${sid}`),phone=g(`ef-p-${sid}`),open=g(`ef-m-${sid}`);
+  if(!name||!open){toast('Name and opening month required');return;}
+  Object.assign(db.stores[sid],{name,city,owner,phone,openingMonth:open});
+  await sheetsSave('updateStore',db.stores[sid]);
+  refreshDropdowns();renderStoreDir();renderDashboard();toast('Store updated');
+}
+
+// ── INVENTORY CRUD ──
+function previewBudget(){
+  const v=parseFloat(document.getElementById('inv-val').value);
+  document.getElementById('inv-preview').textContent=v&&v>0?`MDF budget: ${fmt(Math.round(v*0.01))} (1% of ${fmt(v)})`:'';}
+async function addInventory(){
+  const sid=document.getElementById('inv-store').value;
+  const month=document.getElementById('inv-month').value;
+  const type=document.getElementById('inv-type').value;
+  const value=parseFloat(document.getElementById('inv-val').value);
+  const notes=document.getElementById('inv-notes').value.trim();
+  if(!sid||!month||!value||value<=0){toast('Fill all required fields');return;}
+  const budget=Math.round(value*0.01);
+  const rec={id:uid(),storeId:sid,month,type,value,budget,notes};
+  db.inventory.push(rec);
+  await sheetsSave('addInventory',rec);
+  renderInvTable();renderDashboard();
+  document.getElementById('inv-val').value='';document.getElementById('inv-notes').value='';
+  document.getElementById('inv-preview').textContent='';
+  toast(`Budget added: ${fmt(budget)}`+(sheetsConnected?' · Sheets':' · local'));
+}
+async function deleteInventory(id){
+  const snap=JSON.parse(JSON.stringify(db));
+  db.inventory=db.inventory.filter(i=>i.id!==id);
+  await sheetsSave('deleteInventory',{id});
+  renderInvTable();renderDashboard();
+  toast('Inventory entry deleted',()=>{db=snap;saveLocal();renderInvTable();renderDashboard();toast('Undo successful');});
+}
+function renderInvTable(){
+  const rows=[...db.inventory].sort((a,b)=>b.month.localeCompare(a.month));
+  document.getElementById('inv-tbody').innerHTML=rows.map(i=>{
+    const s=db.stores[i.storeId];
+    return`<tr><td>${s?s.name:'?'}</td><td>${mLabel(i.month)}</td><td><span class="badge ${i.type==='opening'?'bg':'ba'}">${i.type}</span></td><td>${fmt(i.value)}</td><td><strong>${fmt(i.budget)}</strong></td><td style="color:var(--tx2)">${i.notes||'—'}</td><td><button class="btn btn-sm btn-icon btn-d" onclick="deleteInventory('${i.id}')"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join('')||'<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--tx2)">No inventory logged yet</td></tr>';
+}
+
+// ── EXPENSES CRUD ──
+function updateExpPrev(){
+  const sid=document.getElementById('exp-store').value;
+  const month=document.getElementById('exp-month').value;
+  const amt=parseFloat(document.getElementById('exp-amt').value)||0;
+  const info=document.getElementById('exp-info'),prev=document.getElementById('exp-preview');
+  if(!sid||!month){info.innerHTML='';prev.innerHTML='';return;}
+  const ph=getPhase(sid,month),bal=storeBal(sid);
+  const ex=db.expenses.find(e=>e.storeId===sid&&e.month===month);
+  if(ex){info.innerHTML=`<span class="badge ba">Already logged: ${fmt(ex.used)} used this month</span>`;prev.innerHTML='';return;}
+  if(!ph){info.innerHTML=`<span class="badge br">Before store opening</span>`;prev.innerHTML='';return;}
+  info.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge ${ph.badge}">${ph.label}</span><span class="badge bb">Cap: ${fmt(ph.cap)}</span><span class="badge bk">Balance: ${fmt(Math.max(0,bal))}</span></div>`;
+  if(amt>0&&bal>0){
+    const used=Math.min(ph.cap,amt,bal),saved=Math.max(0,amt-used);
+    prev.innerHTML=`<div class="prev-box">Allowance deducted: <strong>${fmt(used)}</strong> · Balance after: <strong style="color:var(--gn)">${fmt(Math.max(0,bal-used))}</strong>${saved>0?` · <span class="badge bg">${fmt(saved)} not claimed</span>`:''}</div>`;
+  }else prev.innerHTML='';
+}
+async function addExpense(){
+  const sid=document.getElementById('exp-store').value;
+  const month=document.getElementById('exp-month').value;
+  const actual=parseFloat(document.getElementById('exp-amt').value);
+  const desc=document.getElementById('exp-desc').value.trim();
+  if(!sid||!month||!actual||actual<0){toast('Fill all required fields');return;}
+  if(db.expenses.find(e=>e.storeId===sid&&e.month===month)){toast('Expense already logged for this month');return;}
+  const ph=getPhase(sid,month);if(!ph){toast('Month is before store opening');return;}
+  const bal=storeBal(sid);if(bal<=0){toast('Budget exhausted for this store');return;}
+  const used=Math.min(ph.cap,actual,bal);
+  const rec={id:uid(),storeId:sid,month,actual,cap:ph.cap,used,desc};
+  db.expenses.push(rec);
+  await sheetsSave('addExpense',rec);
+  renderExpenses();renderDashboard();
+  document.getElementById('exp-amt').value='';document.getElementById('exp-desc').value='';
+  document.getElementById('exp-preview').innerHTML='';document.getElementById('exp-info').innerHTML='';
+  toast(`Logged: ${fmt(used)} deducted from MDF`+(sheetsConnected?' · Sheets':' · local'));
+}
+async function deleteExpense(id){
+  const snap=JSON.parse(JSON.stringify(db));
+  db.expenses=db.expenses.filter(e=>e.id!==id);
+  await sheetsSave('deleteExpense',{id});
+  renderExpenses();renderDashboard();
+  toast('Expense deleted',()=>{db=snap;saveLocal();renderExpenses();renderDashboard();toast('Undo successful');});
+}
+function renderExpenses(q=''){
+  const rows=[...db.expenses].sort((a,b)=>b.month.localeCompare(a.month));
+  const filt=rows.filter(e=>{const s=db.stores[e.storeId];return!q||s?.name.toLowerCase().includes(q.toLowerCase());});
+  document.getElementById('exp-log').innerHTML=`<table><thead><tr><th>Store</th><th>Month</th><th>Actual</th><th>Cap</th><th>Used</th><th>Saved</th><th>Description</th><th></th></tr></thead><tbody>${
+    filt.map(e=>{const s=db.stores[e.storeId],sv=Math.max(0,e.actual-e.used);
+      return`<tr><td>${s?s.name:'?'}</td><td>${mLabel(e.month)}</td><td>${fmt(e.actual)}</td><td>${fmt(e.cap)}</td><td><strong>${fmt(e.used)}</strong></td><td>${sv>0?`<span class="badge bg">${fmt(sv)}</span>`:'—'}</td><td style="color:var(--tx2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.desc||'—'}</td><td><button class="btn btn-sm btn-icon btn-d" onclick="deleteExpense('${e.id}')"><i class="ti ti-trash"></i></button></td></tr>`;
+    }).join('')||'<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--tx2)">No expenses logged yet</td></tr>'
+  }</tbody></table>`;
+}
+
+// ── MATRIX ──
+function renderMatrix(){
+  const from=document.getElementById('rpt-from').value,to=document.getElementById('rpt-to').value;
+  const mode=document.getElementById('rpt-mode').value,showTot=document.getElementById('rpt-total').checked;
+  const el=document.getElementById('matrix-wrap');
+  const stores=Object.values(db.stores).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!from||!to||from>to||!stores.length){el.innerHTML='<div class="empty"><i class="ti ti-calendar-stats"></i><p>Set a date range above to generate the report</p></div>';return;}
+  const months=[];let c=from;while(c<=to){months.push(c);c=addM(c,1);}
+  lastMatrix={stores,months,mode};
+
+  // Header row: Franchisee | City | Pool | [months...] | Total
+  const nowMon=nowM();
+  let html='<table><thead><tr>';
+  html+='<th style="min-width:150px;background:var(--bgh)">Franchisee</th>';
+  html+='<th style="background:var(--bgh)">City</th>';
+  html+='<th class="thd">Pool</th>';
+  months.forEach(m=>{
+    const isNow=m===nowMon;
+    html+=`<th class="shd"${isNow?' style="border-top:2px solid var(--gn);color:var(--gn)"':''}>${mShort(m)}${isNow?' <span class="badge bg" style="font-size:8px;vertical-align:middle">now</span>':''}</th>`;
+  });
+  html+='<th class="thd">Total</th></tr></thead><tbody>';
+
+  // One row per franchisee
+  stores.forEach(s=>{
+    const pool=storePool(s.id);
+    html+=`<tr><td style="font-weight:500"><span style="cursor:pointer;color:var(--acc)" onclick="openStoreModal('${s.id}')">${s.name}</span></td>`;
+    html+=`<td style="color:var(--tx2);font-size:12px">${s.city||'—'}</td>`;
+    html+=`<td class="tc" style="font-size:11px;color:var(--tx2)">${fmt(pool)}</td>`;
+    let rowTotal=0;
+    months.forEach(m=>{
+      const ph=getPhase(s.id,m),exp=db.expenses.find(e=>e.storeId===s.id&&e.month===m),rb=runBal(s.id,m);
+      if(!ph||pool===0){html+=`<td class="sc"><span class="cb">—</span></td>`;return;}
+      let cell='';
+      if(mode==='used'){if(exp){const v=+exp.used;rowTotal+=v;cell=`<div class="cv">${fmt(v)}</div><div class="cs">${fmt(exp.actual)} actual</div>`;}else cell=`<div class="cb">pending</div><div class="cs">cap ${fmt(ph.cap)}</div>`;}
+      else if(mode==='actual'){if(exp){const v=+exp.actual;rowTotal+=v;cell=`<div class="cv">${fmt(v)}</div><div class="cs">${fmt(exp.used)} claimed</div>`;}else cell=`<div class="cb">pending</div>`;}
+      else if(mode==='balance'){const bc=rb<0?'var(--rd)':rb<50000?'var(--am)':'var(--gn)';cell=`<div class="cv" style="color:${bc}">${fmt(Math.max(0,rb))}</div><div class="cs">${ph.label}</div>`;}
+      else{if(exp){const v=+exp.used;rowTotal+=v;const bc=rb<0?'var(--rd)':rb<50000?'var(--am)':'var(--gn)';cell=`<div class="cv">${fmt(v)}</div><div class="cs" style="color:${bc}">bal ${fmt(Math.max(0,rb))}</div>`;}else cell=`<div class="cb">pending</div><div class="cs">cap ${fmt(ph.cap)}</div>`;}
+      html+=`<td class="sc">${cell}</td>`;
+    });
+    html+=`<td class="tc">${rowTotal>0?`<div class="cv">${fmt(rowTotal)}</div>`:'<span class="cb">—</span>'}</td></tr>`;
+  });
+
+  // Totals row
+  if(showTot){
+    html+='<tr class="tot-row"><td colspan="2" style="background:var(--bgh);font-weight:600;padding:9px 11px">All franchisees</td>';
+    let gPool=0;stores.forEach(s=>gPool+=storePool(s.id));
+    html+=`<td class="tc">${fmt(gPool)}</td>`;
+    let grand=0;
+    months.forEach(m=>{
+      let col=0;
+      stores.forEach(s=>{const e=db.expenses.find(x=>x.storeId===s.id&&x.month===m);if(e)col+=(mode==='actual'?+e.actual:+e.used);});
+      grand+=col;
+      html+=`<td class="tc">${col>0?`<div class="cv">${fmt(col)}</div>`:'<span class="cb">—</span>'}</td>`;
+    });
+    html+=`<td class="tc"><strong>${fmt(grand)}</strong></td></tr>`;
+  }
+
+  html+='</tbody></table>';
+  el.innerHTML=html;
+  const fyStr=getFYLabel(from,to);
+  document.getElementById('matrix-title').innerHTML=`<i class="ti ti-table"></i>${fyStr} · ${stores.length} franchisees · ${months.length} months`;
+  if(rptTab==='chart')renderReportChart();
+}
+function getFYLabel(from,to){
+  const[fy,fm]=from.split('-').map(Number);
+  const[ty,tm]=to.split('-').map(Number);
+  if(fm===4&&tm===3&&ty===fy+1)return`FY ${fy}–${String(ty%100).padStart(2,'0')}`;
+  return`${mLabel(from)} → ${mLabel(to)}`;
+}
+function switchTab(t){
+  rptTab=t;
+  document.getElementById('tab-tbl').classList.toggle('active',t==='table');
+  document.getElementById('tab-cht').classList.toggle('active',t==='chart');
+  document.getElementById('rpt-table').style.display=t==='table'?'':'none';
+  document.getElementById('rpt-chart').style.display=t==='chart'?'':'none';
+  if(t==='chart')renderReportChart();
+}
+function renderReportChart(){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gc=dark?'rgba(48,54,61,.7)':'rgba(208,215,222,.7)',tc=dark?'#8B949E':'#656D76';
+  if(reportChart){reportChart.destroy();reportChart=null;}
+  const ctx=document.getElementById('report-chart')?.getContext('2d');
+  const {stores,months}=lastMatrix;
+  if(!ctx||!stores.length||!months.length)return;
+  const clrs=['#58A6FF','#3FB950','#D29922','#F85149','#C9A84C','#A855F7','#06B6D4','#F97316'];
+  reportChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:months.map(mLabel),datasets:stores.map((s,i)=>({
+      label:s.name.replace('Kisna ',''),
+      data:months.map(m=>{const e=db.expenses.find(x=>x.storeId===s.id&&x.month===m);return e?+e.used:0;}),
+      backgroundColor:clrs[i%clrs.length]+'38',borderColor:clrs[i%clrs.length],borderWidth:1.5,borderRadius:3
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:tc,font:{size:11}}}},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11}},border:{color:gc}},
+              y:{grid:{color:gc},ticks:{color:tc,callback:v=>fmt(v)},border:{color:gc}}}}
+  });
+}
+function exportCSV(){
+  const{stores,months,mode}=lastMatrix;
+  if(!stores.length||!months.length){toast('Generate a report first');return;}
+  // Transposed: rows=franchisees, cols=months
+  const header=['Franchisee','City','Pool',...months.map(mShort),'Total'];
+  const rows=stores.map(s=>{
+    const pool=storePool(s.id);
+    let rowTotal=0;
+    const cols=months.map(m=>{
+      const e=db.expenses.find(x=>x.storeId===s.id&&x.month===m);
+      const v=e?(mode==='actual'?+e.actual:+e.used):0;
+      rowTotal+=v;return v;
+    });
+    return[s.name,s.city||'',pool,...cols,rowTotal];
+  });
+  const csv=[header,...rows].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='kisna_mdf_report.csv';a.click();toast('CSV exported');
+}
+
+// ── INIT ──
+function setDefaults(){
+  const m=nowM();
+  ['inv-month','exp-month','st-open'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=m;});
+  // Default report to current Indian Financial Year (Apr–Mar)
+  const[y,mo]=m.split('-').map(Number);
+  const fyStartY=mo>=4?y:y-1;
+  document.getElementById('rpt-from').value=fyStartY+'-04';
+  document.getElementById('rpt-to').value=(fyStartY+1)+'-03';
+}
+function load(){
+  applyTheme(ls.get(TH_KEY)||'dark');
+  const saved=ls.get(DB_KEY);
+  if(saved){try{db=JSON.parse(saved);}catch{seed();}}else seed();
+  const url=ls.get(SH_KEY);
+  if(url){sheetsUrl=url;document.getElementById('sheet-url').value=url;syncFromSheets();}
+  else renderPage(curPage);
+}
+setDefaults();load();
+</script>
+</body>
+</html>
