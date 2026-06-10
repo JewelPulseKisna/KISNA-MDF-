@@ -14,6 +14,7 @@
 //  10. Paste that URL into the Kisna MDF app → Sheets → Connect
 // ═══════════════════════════════════════════════════════════════
 
+const IMPORT_SHEET = 'Import';
 const STORES_SHEET   = 'Stores';
 const INV_SHEET      = 'Inventory';
 const EXP_SHEET      = 'Expenses';
@@ -41,6 +42,7 @@ function doPost(e) {
       case 'deleteInventory':result = deleteInventory(body);break;
       case 'addExpense':     result = addExpense(body);    break;
       case 'deleteExpense':  result = deleteExpense(body); break;
+      case 'importFromRaw': result = importFromRaw(); break;
       default:               result = { error: 'Unknown action: ' + action };
     }
 
@@ -222,7 +224,42 @@ function deleteRowById(sheet, id) {
     }
   }
 }
-
+function importFromRaw() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  initSheets();
+  const importSheet = ss.getSheetByName(IMPORT_SHEET);
+  if (!importSheet) return { error: 'Import sheet not found' };
+  const data = importSheet.getDataRange().getValues();
+  if (data.length < 2) return { error: 'No data in Import sheet' };
+  const storesSheet = ss.getSheetByName(STORES_SHEET);
+  const lastRow = storesSheet.getLastRow();
+  if (lastRow > 1) storesSheet.getRange(2, 1, lastRow - 1, storesSheet.getLastColumn()).clearContent();
+  const rows = [];
+  for (let i = 1; i < data.length; i++) {
+    const r = data[i];
+    if (!r[0]) continue;
+    const storeCode    = String(r[0] || '');
+    const zone         = String(r[1] || '');
+    const state        = String(r[2] || '');
+    const city         = String(r[3] || '');
+    const softLaunch   = String(r[4] || '');
+    const inauguration = String(r[5] || '');
+    const location     = String(r[6] || '');
+    const name         = String(r[7] || '');
+    const phone        = String(r[8] || '');
+    const email        = String(r[9] || '');
+    const locationType = String(r[10] || '');
+    const address      = String(r[11] || '');
+    const pinCode      = String(r[12] || '');
+    const storeSize    = String(r[13] || '');
+    const floor        = String(r[14] || '');
+    const gst          = String(r[15] || '');
+    const openingMonth = inauguration || softLaunch || '';
+    rows.push([storeCode,name,storeCode,zone,state,city,softLaunch,inauguration,openingMonth,phone,email,locationType,location,address,pinCode,storeSize,floor,gst]);
+  }
+  if (rows.length > 0) storesSheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+  return { ok: true, imported: rows.length };
+}
 function deleteRowsWhere(sheet, colName, value) {
   if (!sheet) return;
   const rows   = sheet.getDataRange().getValues();
