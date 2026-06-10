@@ -727,7 +727,7 @@ function renderDashChart(stores){
 }
 
 function renderDashTable(q){
-  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase()));
+  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||( s.storeCode&&s.storeCode.toLowerCase().includes(q.toLowerCase())));
   const m=nowM();
   document.getElementById('dash-tbody').innerHTML=stores.map(s=>{
     const pool=storePool(s.id),used=storeUsed(s.id),bal=Math.max(0,pool-used);
@@ -738,7 +738,7 @@ function renderDashTable(q){
       <td style="color:var(--tx2);font-size:12px">${s.storeCode||'—'}</td>
       <td><strong style="cursor:pointer;color:var(--acc)" onclick="openStoreModal('${s.id}')">${s.name}</strong></td>
       <td style="color:var(--tx2)">${s.city||'—'}</td>
-      <td>${mLabel(s.openingMonth||s.inaugurationDate||s.softLaunchDate)}</td>
+      <td>${mLabel(s.inaugurationDate)}</td>
       <td>${ph?`<span class="badge ${ph.badge}">${ph.label}</span>`:'<span class="badge bk">Pre-launch</span>'}</td>
       <td>${fmt(pool)}</td><td>${fmt(used)}</td>
       <td><strong>${fmt(bal)}</strong></td>
@@ -834,7 +834,7 @@ async function deleteStore(sid){
   toast('Store deleted',()=>{db=snap;saveLocal();refreshDropdowns();renderStoreDir();renderDashboard();toast('Undo successful');});
 }
 function renderStoreDir(q=''){
-  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase()));
+  const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||(s.storeCode&&s.storeCode.toLowerCase().includes(q.toLowerCase())));
   document.getElementById('store-dir').innerHTML=stores.length?stores.map(s=>{
     const bal=Math.max(0,storeBal(s.id)),pool=storePool(s.id);
     const ini=s.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
