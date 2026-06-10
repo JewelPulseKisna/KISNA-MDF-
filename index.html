@@ -253,6 +253,7 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
     <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme"><i class="ti ti-sun" id="theme-icon"></i></button>
     <button class="btn btn-sm" id="refresh-btn" onclick="refreshFromSheets()"><i class="ti ti-refresh"></i><span>Refresh</span></button>
     <button class="btn btn-sm" onclick="nav('settings')"><i class="ti ti-settings"></i><span>Sheets</span></button>
+    <button class="btn btn-sm" id="sheet-link-btn" onclick="openSheet()" title="Open Google Sheet"><i class="ti ti-table-share"></i><span>Sheet</span></button> 
   </div>
 </nav>
 
@@ -573,6 +574,11 @@ async function refreshFromSheets(){
   if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2"></i><span>Syncing…</span>';}
   await syncFromSheets();
   if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh"></i><span>Refresh</span>';}
+}
+function openSheet(){
+  if(!sheetsUrl){toast('Connect to Sheets first');return;}
+  const sheetBase=sheetsUrl.replace('/exec','').replace('/dev','');
+  window.open(sheetBase,'_blank');
 }  
 async function connectSheets(){
   sheetsUrl=document.getElementById('sheet-url').value.trim();
