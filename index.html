@@ -283,7 +283,7 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
     <div class="ct"><i class="ti ti-building-store"></i>All stores</div>
     <div class="sw"><i class="ti ti-search"></i><input class="si-inp" id="dash-search" placeholder="Search stores…" oninput="dashQ=this.value;renderDashTable(dashQ)"></div>
     <div class="tbl-outer"><table>
-      <thead><tr><th>Store</th><th>City</th><th>Opening</th><th>Phase</th><th>Pool</th><th>Used</th><th>Balance</th><th>Utilisation</th><th></th></tr></thead>
+      <thead><tr><th>Code</th><th>Store</th><th>City</th><th>Opening</th><th>Phase</th><th>Pool</th><th>Used</th><th>Balance</th><th>Utilisation</th><th></th></tr></thead>
       <tbody id="dash-tbody"></tbody>
     </table></div>
   </div>
@@ -735,6 +735,7 @@ function renderDashTable(q){
     const bc=pct>85?'var(--rd)':pct>60?'var(--am)':'var(--gn)';
     const ph=getPhase(s.id,m);
     return`<tr>
+      <td style="color:var(--tx2);font-size:12px">${s.storeCode||'—'}</td>
       <td><strong style="cursor:pointer;color:var(--acc)" onclick="openStoreModal('${s.id}')">${s.name}</strong></td>
       <td style="color:var(--tx2)">${s.city||'—'}</td>
       <td>${mLabel(s.openingMonth||s.inaugurationDate||s.softLaunchDate)}</td>
