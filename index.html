@@ -299,6 +299,7 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
     <div class="row" style="margin-bottom:14px">
       <button class="btn btn-p" onclick="connectSheets()"><i class="ti ti-plug"></i>Connect &amp; sync</button>
       <button class="btn btn-d" onclick="disconnectSheets()"><i class="ti ti-plug-x"></i>Disconnect</button>
+      <button class="btn" onclick="runImport()"><i class="ti ti-file-import"></i>Import from sheet</button>
     </div>
     <div id="connect-status"></div>
     <hr class="dv">
@@ -575,6 +576,16 @@ async function refreshFromSheets(){
   await syncFromSheets();
   if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh"></i><span>Refresh</span>';}
 }
+async function runImport(){
+  if(!sheetsUrl){toast('Connect to Sheets first');return;}
+  toast('Importing…');
+  try{
+    const r=await apiCall({action:'importFromRaw'});
+    if(r.error){toast('Import failed: '+r.error);return;}
+    await syncFromSheets();
+    toast(`Imported ${r.imported} stores successfully`);
+  }catch(e){toast('Import error: '+e.message);}
+}  
 function openSheet(){
   if(!sheetsUrl){toast('Connect to Sheets first');return;}
   const sheetBase=sheetsUrl.replace('/exec','').replace('/dev','');
@@ -814,14 +825,31 @@ function renderStoreDir(q=''){
       </div>
       <div class="ef">
         <div class="fr c2" style="margin-top:10px">
-          <div><label>Store name</label><input id="ef-n-${s.id}" value="${esc(s.name)}"></div>
-          <div><label>City</label><input id="ef-c-${s.id}" value="${esc(s.city||'')}"></div>
+          <div><label>Store Name</label><input id="ef-n-${s.id}" value="${esc(s.name)}"></div>
+          <div><label>Store Code</label><input id="ef-sc-${s.id}" value="${esc(s.storeCode||'')}"></div>
         </div>
         <div class="fr c2">
-          <div><label>Owner</label><input id="ef-o-${s.id}" value="${esc(s.owner||'')}"></div>
+          <div><label>Zone</label><input id="ef-z-${s.id}" value="${esc(s.zone||'')}"></div>
+          <div><label>State</label><input id="ef-st-${s.id}" value="${esc(s.state||'')}"></div>
+        </div>
+        <div class="fr c2">
+          <div><label>City</label><input id="ef-c-${s.id}" value="${esc(s.city||'')}"></div>
           <div><label>Phone</label><input id="ef-p-${s.id}" value="${esc(s.phone||'')}"></div>
         </div>
-        <div class="fg"><label>Opening month</label><input type="month" id="ef-m-${s.id}" value="${s.openingMonth||''}"></div>
+        <div class="fr c2">
+          <div><label>Email</label><input id="ef-e-${s.id}" value="${esc(s.email||'')}"></div>
+          <div><label>Location Type</label>
+            <select id="ef-lt-${s.id}">
+              <option value="">Select</option>
+              <option value="Street"${s.locationType==='Street'?' selected':''}>Street</option>
+              <option value="Mall"${s.locationType==='Mall'?' selected':''}>Mall</option>
+            </select>
+          </div>
+        </div>
+      <div class="fr c2">
+        <div><label>Soft Launch</label><input type="month" id="ef-sl-${s.id}" value="${s.softLaunchDate||''}"></div>
+        <div><label>Inauguration</label><input type="month" id="ef-in-${s.id}" value="${s.inaugurationDate||''}"></div>
+      </div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-p btn-sm" onclick="saveEdit('${s.id}')"><i class="ti ti-check"></i>Save</button>
           <button class="btn btn-sm" onclick="cancelEdit('${s.id}')"><i class="ti ti-x"></i>Cancel</button>
@@ -834,9 +862,9 @@ function startEdit(sid){document.getElementById('sc-'+sid)?.classList.add('editi
 function cancelEdit(sid){document.getElementById('sc-'+sid)?.classList.remove('editing');}
 async function saveEdit(sid){
   const g=id=>document.getElementById(id)?.value.trim();
-  const name=g(`ef-n-${sid}`),city=g(`ef-c-${sid}`),owner=g(`ef-o-${sid}`),phone=g(`ef-p-${sid}`),open=g(`ef-m-${sid}`);
-  if(!name||!open){toast('Name and opening month required');return;}
-  Object.assign(db.stores[sid],{name,city,owner,phone,openingMonth:open});
+  const name=g(`ef-n-${sid}`),storeCode=g(`ef-sc-${sid}`),zone=g(`ef-z-${sid}`),state=g(`ef-st-${sid}`),city=g(`ef-c-${sid}`),phone=g(`ef-p-${sid}`),email=g(`ef-e-${sid}`),locationType=g(`ef-lt-${sid}`),softLaunchDate=g(`ef-sl-${sid}`),inaugurationDate=g(`ef-in-${sid}`);
+  if(!name){toast('Store name is required');return;}
+  Object.assign(db.stores[sid],{name,storeCode,zone,state,city,phone,email,locationType,softLaunchDate,inaugurationDate,openingMonth:inaugurationDate||softLaunchDate});
   await sheetsSave('updateStore',db.stores[sid]);
   refreshDropdowns();renderStoreDir();renderDashboard();toast('Store updated');
 }
