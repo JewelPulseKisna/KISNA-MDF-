@@ -267,8 +267,11 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
     </div>
     <div>
       <div class="card" style="margin-bottom:12px">
-        <div class="ct"><i class="ti ti-alert-triangle" style="color:var(--am)"></i>Alerts</div>
-        <div id="dash-alerts"></div>
+        <div class="ct" style="cursor:pointer;justify-content:space-between" onclick="toggleAlerts()">
+          <span style="display:flex;align-items:center;gap:7px"><i class="ti ti-alert-triangle" style="color:var(--am)"></i>Alerts</span>
+          <i class="ti ti-chevron-down" id="alerts-chevron"></i>
+        </div>
+        <div id="dash-alerts" style="display:none"></div>
       </div>
       <div class="card mb0">
         <div class="ct"><i class="ti ti-clock" style="color:var(--bl)"></i>Pending this month</div>
@@ -533,6 +536,13 @@ function toast(msg,undoFn){
   if(undoFn)undoStack={fn:undoFn,el};
   setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),320);if(undoStack?.el===el)undoStack=null;},5000);
 }
+function toggleAlerts(){
+  const el=document.getElementById('dash-alerts');
+  const ic=document.getElementById('alerts-chevron');
+  const open=el.style.display==='none';
+  el.style.display=open?'':'none';
+  ic.className=open?'ti ti-chevron-up':'ti ti-chevron-down';
+}  
 function doUndo(){
   if(!undoStack)return;
   undoStack.fn();
@@ -707,7 +717,7 @@ function renderDashTable(q){
     return`<tr>
       <td><strong style="cursor:pointer;color:var(--acc)" onclick="openStoreModal('${s.id}')">${s.name}</strong></td>
       <td style="color:var(--tx2)">${s.city||'—'}</td>
-      <td>${mLabel(s.openingMonth)}</td>
+      <td>${mLabel(s.openingMonth||s.inaugurationDate||s.softLaunchDate)}</td>
       <td>${ph?`<span class="badge ${ph.badge}">${ph.label}</span>`:'<span class="badge bk">Pre-launch</span>'}</td>
       <td>${fmt(pool)}</td><td>${fmt(used)}</td>
       <td><strong>${fmt(bal)}</strong></td>
@@ -814,7 +824,7 @@ function renderStoreDir(q=''){
         <div class="savatar">${ini}</div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:600;font-size:13px;cursor:pointer" onclick="openStoreModal('${s.id}')">${s.name}</div>
-          <div style="font-size:11px;color:var(--tx2)">${s.city||''}${s.owner?' · '+s.owner:''} · ${mLabel(s.openingMonth)}</div>
+          <div style="font-size:11px;color:var(--tx2)">${s.city||''}${s.owner?' · '+s.owner:''} · ${mLabel(s.openingMonth||s.inaugurationDate||s.softLaunchDate)}</div>
           <div style="margin-top:6px"><div class="utrack"><div class="ufill" style="width:${Math.min(100,pct)}%;background:${bc}"></div></div>
           <div class="ulb"><span>${pct}% used</span><span>${fmt(bal)} left of ${fmt(pool)}</span></div></div>
         </div>
