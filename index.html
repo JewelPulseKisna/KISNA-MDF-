@@ -730,99 +730,22 @@ function renderDashboard(){
 }
 
 function renderDashChart(stores){
-  const colorScale=[
-    {min:0,max:0,color:'#30363D',label:'No stores'},
-    {min:1,max:2,color:'#B5D4F4',label:'1–2'},
-    {min:3,max:4,color:'#85B7EB',label:'3–4'},
-    {min:5,max:7,color:'#378ADD',label:'5–7'},
-    {min:8,max:10,color:'#185FA5',label:'8–10'},
-    {min:11,max:999,color:'#0C447C',label:'11+'}
-  ];
-  function getColor(n){
-    if(!n||n===0)return colorScale[0].color;
-    for(let i=1;i<colorScale.length;i++)if(n<=colorScale[i].max)return colorScale[i].color;
-    return colorScale[colorScale.length-1].color;
-  }
   const stateCounts={};
   Object.values(db.stores).forEach(s=>{
     if(s.state&&s.state!=='state')stateCounts[s.state]=(stateCounts[s.state]||0)+1;
   });
-  const statePaths={
-    'Jammu & Kashmir':'M 185 30 L 210 25 L 235 35 L 245 55 L 230 70 L 215 75 L 195 65 L 180 50 Z',
-    'Himachal Pradesh':'M 215 75 L 235 70 L 250 80 L 245 100 L 225 105 L 210 95 Z',
-    'Punjab':'M 185 75 L 210 70 L 215 95 L 205 110 L 185 105 L 175 90 Z',
-    'Uttarakhand':'M 245 95 L 270 90 L 285 105 L 275 125 L 250 125 L 240 110 Z',
-    'Haryana':'M 185 105 L 210 100 L 215 120 L 205 135 L 185 130 L 178 115 Z',
-    'Delhi':'M 210 118 L 222 115 L 225 128 L 213 130 Z',
-    'Uttar Pradesh':'M 225 105 L 285 100 L 320 115 L 325 155 L 290 170 L 250 165 L 225 145 L 222 125 Z',
-    'Rajasthan':'M 160 110 L 205 108 L 220 140 L 215 185 L 185 210 L 155 205 L 135 175 L 140 140 Z',
-    'Gujarat':'M 115 175 L 155 170 L 165 200 L 155 235 L 130 245 L 105 225 L 100 200 Z',
-    'Madhya Pradesh':'M 190 185 L 250 175 L 290 185 L 295 225 L 265 250 L 220 255 L 185 235 L 180 210 Z',
-    'Bihar':'M 285 145 L 330 140 L 345 165 L 335 190 L 295 195 L 275 175 Z',
-    'Jharkhand':'M 295 195 L 340 188 L 355 215 L 340 240 L 305 245 L 285 225 Z',
-    'West Bengal':'M 340 155 L 375 150 L 385 180 L 375 220 L 355 245 L 335 240 L 330 210 L 338 185 Z',
-    'Chattisgarh':'M 285 225 L 340 220 L 355 255 L 340 285 L 305 295 L 275 270 L 275 245 Z',
-    'Maharashtra':'M 150 240 L 195 235 L 230 250 L 240 290 L 220 325 L 185 330 L 155 305 L 140 275 Z',
-    'Odisha':'M 330 240 L 375 235 L 385 265 L 370 300 L 340 310 L 315 290 L 310 265 Z',
-    'Telangana':'M 230 295 L 275 285 L 300 305 L 295 340 L 265 355 L 235 345 L 220 320 Z',
-    'Andhra Pradesh':'M 235 345 L 295 335 L 325 360 L 315 400 L 280 415 L 245 400 L 230 375 Z',
-    'Karnataka':'M 185 330 L 235 325 L 255 355 L 250 395 L 220 415 L 190 405 L 170 375 L 168 350 Z',
-    'Tamilnadu':'M 220 415 L 270 405 L 285 440 L 265 480 L 240 490 L 215 465 L 210 440 Z',
-    'Kerala':'M 190 415 L 220 415 L 215 460 L 200 490 L 180 480 L 175 450 Z',
-    'Assam':'M 390 145 L 430 140 L 450 155 L 440 175 L 410 180 L 385 170 Z',
-    'Tripura':'M 410 185 L 435 182 L 440 200 L 425 210 L 408 205 Z',
-    'Manipur':'M 445 170 L 465 168 L 470 185 L 455 195 L 440 188 Z',
-    'Chandigarh':'M 200 88 L 210 86 L 212 94 L 202 96 Z',
-  };
-  const svg=document.getElementById('india-map');
-  if(!svg)return;
-  svg.innerHTML='';
-  const tooltip=document.getElementById('map-tooltip');
-  Object.entries(statePaths).forEach(([state,path])=>{
-    const count=stateCounts[state]||0;
-    const el=document.createElementNS('http://www.w3.org/2000/svg','path');
-    el.setAttribute('d',path);
-    el.setAttribute('fill',getColor(count));
-    el.setAttribute('stroke','var(--bg)');
-    el.setAttribute('stroke-width','1.5');
-    el.style.cursor='pointer';
-    el.style.transition='opacity 0.15s';
-    el.addEventListener('mousemove',e=>{
-      const rect=svg.parentElement.getBoundingClientRect();
-      tooltip.style.display='block';
-      tooltip.style.left=(e.clientX-rect.left+12)+'px';
-      tooltip.style.top=(e.clientY-rect.top-10)+'px';
-      tooltip.innerHTML=`<div style="font-weight:600;margin-bottom:4px;color:var(--tx)">${state}</div><div style="color:var(--tx2)">Stores: <strong style="color:var(--tx)">${count}</strong></div>`;
-    });
-    el.addEventListener('mouseleave',()=>{tooltip.style.display='none';});
-    el.addEventListener('mouseenter',()=>{el.style.opacity='0.75';});
-    el.addEventListener('mouseleave',()=>{el.style.opacity='1';tooltip.style.display='none';});
-    svg.appendChild(el);
-    if(count>0){
-      try{
-        const tmp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        tmp.setAttribute('d',path);
-        svg.appendChild(tmp);
-        const bb=tmp.getBBox();
-        svg.removeChild(tmp);
-        const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-        txt.setAttribute('x',bb.x+bb.width/2);
-        txt.setAttribute('y',bb.y+bb.height/2+4);
-        txt.setAttribute('text-anchor','middle');
-        txt.setAttribute('font-size',state==='Delhi'||state==='Chandigarh'?'6':'10');
-        txt.setAttribute('font-weight','500');
-        txt.setAttribute('fill',count>=8?'#ffffff':'#0C447C');
-        txt.setAttribute('pointer-events','none');
-        txt.textContent=count;
-        svg.appendChild(txt);
-      }catch(e){}
-    }
-  });
-  document.getElementById('map-legend').innerHTML=colorScale.slice(1).map(c=>
-    `<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:${c.color};display:inline-block"></span>${c.label}</span>`
-  ).join('')+`<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#30363D;display:inline-block"></span>No stores</span>`;
+  const sorted=Object.entries(stateCounts).sort((a,b)=>b[1]-a[1]);
+  const wrap=document.getElementById('india-map-wrap');
+  if(!wrap)return;
+  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">${
+    sorted.map(([state,count])=>`
+      <div style="background:var(--bgh);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 12px;display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:11px;color:var(--tx2)">${state}</div><div style="font-size:18px;font-weight:600;color:var(--tx)">${count}</div></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--bl)"></div>
+      </div>`
+    ).join('')
+  }</div>`;
 }
-
 function renderDashTable(q){
   const stores=Object.values(db.stores).filter(s=>!q||s.name.toLowerCase().includes(q.toLowerCase())||( s.storeCode&&s.storeCode.toLowerCase().includes(q.toLowerCase())));
   const m=nowM();
