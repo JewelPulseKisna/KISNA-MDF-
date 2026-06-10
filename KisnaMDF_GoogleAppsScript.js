@@ -62,7 +62,7 @@ function initSheets() {
 
   if (!ss.getSheetByName(STORES_SHEET)) {
     const s = ss.insertSheet(STORES_SHEET);
-    s.appendRow(['id', 'name', 'city', 'owner', 'phone', 'openingMonth']);
+    s.appendRow(['id','name','storeCode','zone','state','city','softLaunchDate','inaugurationDate','openingMonth','phone','email','locationType','location','address','pinCode','storeSize','floor','gst']);
     s.setFrozenRows(1);
     formatHeader(s);
   }
@@ -145,8 +145,11 @@ function addStore(data) {
   initSheets();
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(STORES_SHEET);
   sheet.appendRow([
-    data.id, data.name, data.city || '', data.owner || '',
-    data.phone || '', data.openingMonth || ''
+    data.id, data.name, data.storeCode||'', data.zone||'', data.state||'',
+    data.city||'', data.softLaunchDate||'', data.inaugurationDate||'',
+    data.openingMonth||'', data.phone||'', data.email||'',
+    data.locationType||'', data.location||'', data.address||'',
+    data.pinCode||'', data.storeSize||'', data.floor||'', data.gst||''
   ]);
   return { ok: true };
 }
