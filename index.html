@@ -507,7 +507,27 @@ function seed(){
 // ── UTILS ──
 function uid(){return Math.random().toString(36).slice(2,9)}
 function fmt(n){n=Math.round(n);if(n>=10000000)return'₹'+(n/10000000).toFixed(2)+'Cr';if(n>=100000)return'₹'+(n/100000).toFixed(2)+'L';if(n>=1000)return'₹'+(n/1000).toFixed(1)+'K';return'₹'+n;}
-function mLabel(m){if(!m)return'—';const[y,mo]=m.split('-').map(Number);return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+' '+y;}
+function mLabel(m){
+  if(!m||m==='-'||m==='undefined')return'—';
+  m=String(m).trim();
+  // Format: YYYY-MM
+  if(/^\d{4}-\d{2}$/.test(m)){
+    const[y,mo]=m.split('-').map(Number);
+    return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+' '+y;
+  }
+  // Format: DD-MMM-YY (e.g. 29-Oct-21)
+  if(/^\d{2}-[A-Za-z]{3}-\d{2}$/.test(m)){
+    const p=m.split('-');
+    const y=Number(p[2])<50?2000+Number(p[2]):1900+Number(p[2]);
+    return p[1]+' '+y;
+  }
+  // Format: DD-MMM-YYYY (e.g. 29-Oct-2021)
+  if(/^\d{2}-[A-Za-z]{3}-\d{4}$/.test(m)){
+    const p=m.split('-');
+    return p[1]+' '+p[2];
+  }
+  return'—';
+}
 function mShort(m){if(!m)return'—';const[y,mo]=m.split('-').map(Number);return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][mo-1]+" '"+(y%100).toString().padStart(2,'0');}
 function addM(m,n){let[y,mo]=m.split('-').map(Number);mo+=n;while(mo>12){mo-=12;y++}while(mo<1){mo+=12;y--}return y+'-'+String(mo).padStart(2,'0');}
 function mDiff(a,b){const[ay,am]=a.split('-').map(Number);const[by,bm]=b.split('-').map(Number);return(by-ay)*12+(bm-am);}
