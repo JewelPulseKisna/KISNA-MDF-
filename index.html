@@ -64,6 +64,8 @@ body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--tx)
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:768px){.g5{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){.g4{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
 @media(max-width:480px){.page{padding:12px}.nb span{display:none}}
 
@@ -259,7 +261,7 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
 
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
-  <div class="g4" id="stat-row"></div>
+  <div class="g5" id="stat-row"></div>
   <div class="g2" style="margin-bottom:16px">
     <div class="card mb0">
       <div class="ct"><i class="ti ti-chart-bar"></i>Store utilisation</div>
@@ -574,7 +576,20 @@ function doUndo(){
 // ── MDF LOGIC ──
 function storePool(sid){return db.inventory.filter(i=>i.storeId===sid).reduce((a,i)=>a+(+i.budget),0);}
 function storeUsed(sid){return db.expenses.filter(e=>e.storeId===sid).reduce((a,e)=>a+(+e.used),0);}
-function storeBal(sid){return storePool(sid)-storeUsed(sid);}
+function storePerished(sid){
+  const open=db.stores[sid]?.openingMonth;if(!open)return 0;
+  const cur=nowM();let perished=0;let m=open;
+  while(m<cur){
+    const ph=getPhase(sid,m);
+    if(ph){
+      const exp=db.expenses.find(e=>e.storeId===sid&&e.month===m);
+      perished+=exp?Math.max(0,ph.cap-(+exp.used)):ph.cap;
+    }
+    m=addM(m,1);
+  }
+  return perished;
+}
+function storeBal(sid){return Math.max(0,storePool(sid)-storeUsed(sid)-storePerished(sid));}
 function getPhase(sid,month){
   const open=db.stores[sid]?.openingMonth;if(!open)return null;
   const d=mDiff(open,month);if(d<0)return null;
@@ -677,8 +692,9 @@ function renderDashboard(){
   const stores=Object.values(db.stores);
   const totalPool=stores.reduce((a,s)=>a+storePool(s.id),0);
   const totalUsed=stores.reduce((a,s)=>a+storeUsed(s.id),0);
-  const totalBal=Math.max(0,totalPool-totalUsed);
-  const pct=totalPool?Math.round(totalUsed/totalPool*100):0;
+  const totalPerished=stores.reduce((a,s)=>a+storePerished(s.id),0);
+  const totalBal=Math.max(0,totalPool-totalUsed-totalPerished);
+  const pct=totalPool?Math.round((totalUsed+totalPerished)/totalPool*100):0;
   const active=stores.filter(s=>storePool(s.id)>0&&storeBal(s.id)>0).length;
   const m=nowM();
 
@@ -686,7 +702,7 @@ function renderDashboard(){
     <div class="stat-card sc-bl"><div class="si bl"><i class="ti ti-building-store"></i></div><div class="sl">Total stores</div><div class="sv">${stores.length}</div><div class="ss">${active} active with balance</div><div class="sbar"><div class="sbar-f" style="background:var(--bl);width:${stores.length?Math.round(active/stores.length*100):0}%"></div></div></div>
     <div class="stat-card sc-bl"><div class="si bl"><i class="ti ti-coins"></i></div><div class="sl">Total MDF pool</div><div class="sv">${fmt(totalPool)}</div><div class="ss">1% of all inventory value</div><div class="sbar"><div class="sbar-f" style="background:var(--bl);width:100%"></div></div></div>
     <div class="stat-card sc-am"><div class="si am"><i class="ti ti-cash"></i></div><div class="sl">Total utilised</div><div class="sv" style="color:var(--am)">${fmt(totalUsed)}</div><div class="ss">${pct}% of pool consumed</div><div class="sbar"><div class="sbar-f" style="background:${pct>85?'var(--rd)':'var(--am)'};width:${pct}%"></div></div></div>
-    <div class="stat-card sc-gn"><div class="si gn"><i class="ti ti-wallet"></i></div><div class="sl">Total balance</div><div class="sv" style="color:var(--gn)">${fmt(totalBal)}</div><div class="ss">${100-pct}% remaining</div><div class="sbar"><div class="sbar-f" style="background:var(--gn);width:${100-pct}%"></div></div></div>`;
+    <div class="stat-card sc-gn"><div class="si gn"><i class="ti ti-wallet"></i></div><div class="sl">Total balance</div><div class="sv" style="color:var(--gn)">${fmt(totalBal)}</div><div class="ss">${100-pct}% remaining</div><div class="sbar"><div class="sbar-f" style="background:var(--gn);width:${100-pct}%"></div></div></div
 
   renderDashChart(stores);
 
@@ -980,9 +996,10 @@ async function deleteExpense(id){
 function renderExpenses(q=''){
   const rows=[...db.expenses].sort((a,b)=>b.month.localeCompare(a.month));
   const filt=rows.filter(e=>{const s=db.stores[e.storeId];return!q||s?.name.toLowerCase().includes(q.toLowerCase());});
-  document.getElementById('exp-log').innerHTML=`<table><thead><tr><th>Store</th><th>Month</th><th>Actual</th><th>Cap</th><th>Used</th><th>Saved</th><th>Description</th><th></th></tr></thead><tbody>${
+  document.getElementById('exp-log').innerHTML=`<table><thead><tr><th>Store</th><th>Month</th><th>Actual</th><th>Cap</th><th>Used</th><th>Perished</th><th>Description</th><th></th></tr></thead><tbody>${
     filt.map(e=>{const s=db.stores[e.storeId],sv=Math.max(0,e.actual-e.used);
-      return`<tr><td>${s?s.name:'?'}</td><td>${mLabel(e.month)}</td><td>${fmt(e.actual)}</td><td>${fmt(e.cap)}</td><td><strong>${fmt(e.used)}</strong></td><td>${sv>0?`<span class="badge bg">${fmt(sv)}</span>`:'—'}</td><td style="color:var(--tx2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.desc||'—'}</td><td><button class="btn btn-sm btn-icon btn-d" onclick="deleteExpense('${e.id}')"><i class="ti ti-trash"></i></button></td></tr>`;
+      const perished=Math.max(0,(+e.cap)-(+e.used));
+      return`<tr><td>${s?s.name:'?'}</td><td>${mLabel(e.month)}</td><td>${fmt(e.actual)}</td><td>${fmt(e.cap)}</td><td><strong>${fmt(e.used)}</strong></td><td>${perished>0?`<span class="badge br">${fmt(perished)}</span>`:'—'}</td><td style="color:var(--tx2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.desc||'—'}</td><td><button class="btn btn-sm btn-icon btn-d" onclick="deleteExpense('${e.id}')"><i class="ti ti-trash"></i></button></td></tr>`;
     }).join('')||'<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--tx2)">No expenses logged yet</td></tr>'
   }</tbody></table>`;
 }
