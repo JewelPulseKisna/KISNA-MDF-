@@ -541,6 +541,13 @@ async function syncFromSheets(){
     document.getElementById('connect-status').innerHTML=`<span style="color:var(--rd);font-size:12px">Connection failed: ${e.message}</span>`;
   }
 }
+async function refreshFromSheets(){
+  if(!sheetsUrl){toast('Connect to Sheets first — go to Sheets settings');return;}
+  const btn=document.getElementById('refresh-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2"></i><span>Syncing…</span>';}
+  await syncFromSheets();
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh"></i><span>Refresh</span>';}
+}  
 async function connectSheets(){
   sheetsUrl=document.getElementById('sheet-url').value.trim();
   if(!sheetsUrl){toast('Paste your Apps Script URL first');return;}
