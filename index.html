@@ -319,21 +319,47 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0}
     <div class="card mb0">
       <div class="ct"><i class="ti ti-plus"></i>Add new store</div>
       <div class="fr c2">
-        <div><label>Store name</label><input id="st-name" placeholder="Kisna Andheri"></div>
+        <div><label>Store Code</label><input id="st-code" placeholder="e.g. KSN001"></div>
+        <div><label>Zone</label><input id="st-zone" placeholder="e.g. West"></div>
+      </div>
+      <div class="fr c2">
+        <div><label>State</label><input id="st-state" placeholder="e.g. Maharashtra"></div>
         <div><label>City</label><input id="st-city" placeholder="Mumbai"></div>
       </div>
       <div class="fr c2">
-        <div><label>Owner</label><input id="st-owner" placeholder="Name"></div>
-        <div><label>Phone</label><input id="st-phone" placeholder="+91…"></div>
+        <div><label>Soft Launch Date</label><input id="st-soft" type="month"></div>
+        <div><label>Inauguration Date</label><input id="st-inaug" type="month"></div>
       </div>
-      <div class="fg"><label>Opening month</label><input id="st-open" type="month"></div>
-      <button class="btn btn-p" onclick="addStore()"><i class="ti ti-plus"></i>Add store</button>
-    </div>
-    <div class="card mb0">
-      <div class="ct"><i class="ti ti-list"></i>Store directory</div>
-      <div class="sw"><i class="ti ti-search"></i><input class="si-inp" placeholder="Search…" oninput="renderStoreDir(this.value)"></div>
-      <div id="store-dir"></div>
-    </div>
+      <div class="fr c2">
+        <div><label>Contact No</label><input id="st-phone" placeholder="+91…"></div>
+        <div><label>Mail ID</label><input id="st-email" placeholder="store@example.com"></div>
+      </div>
+      <div class="fr c2">
+        <div><label>Location Type</label>
+          <select id="st-loctype">
+            <option value="">Select</option>
+            <option value="Street">Street</option>
+            <option value="Mall">Mall</option>
+          </select>
+        </div>
+        <div><label>Location</label><input id="st-location" placeholder="e.g. Linking Road"></div>
+      </div>
+      <div class="fg"><label>Store Address</label><input id="st-address" placeholder="Full address"></div>
+      <div class="fr c2">
+        <div><label>Pin Code</label><input id="st-pin" placeholder="400001"></div>
+        <div><label>Store Size (sq ft)</label><input id="st-size" placeholder="e.g. 800"></div>
+      </div>
+      <div class="fr c2">
+        <div><label>Floor</label><input id="st-floor" placeholder="e.g. Ground, 1st"></div>
+        <div><label>GST Number</label><input id="st-gst" placeholder="GST No."></div>
+      </div>
+  <button class="btn btn-p" onclick="addStore()"><i class="ti ti-plus"></i>Add store</button>
+  </div>
+  <div class="card mb0">
+    <div class="ct"><i class="ti ti-list"></i>Store directory</div>
+    <div class="sw"><i class="ti ti-search"></i><input class="si-inp" placeholder="Search…" oninput="renderStoreDir(this.value)"></div>
+    <div id="store-dir"></div>
+   </div>
   </div>
 </div>
 
@@ -1001,7 +1027,7 @@ function setDefaults(){
 function load(){
   applyTheme(ls.get(TH_KEY)||'dark');
   const saved=ls.get(DB_KEY);
-  if(saved){try{db=JSON.parse(saved);}catch{seed();}}else seed();
+  if(saved){try{db=JSON.parse(saved);}catch{db={stores:{},inventory:[],expenses:[]};saveLocal();}}else{db={stores:{},inventory:[],expenses:[]};saveLocal();}
   const url=ls.get(SH_KEY);
   if(url){sheetsUrl=url;document.getElementById('sheet-url').value=url;syncFromSheets();}
   else renderPage(curPage);
