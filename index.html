@@ -577,7 +577,8 @@ function doUndo(){
 function storePool(sid){return db.inventory.filter(i=>i.storeId===sid).reduce((a,i)=>a+(+i.budget),0);}
 function storeUsed(sid){return db.expenses.filter(e=>e.storeId===sid).reduce((a,e)=>a+(+e.used),0);}
 function storePerished(sid){
-  const open=db.stores[sid]?.openingMonth;if(!open)return 0;
+  if(db.inventory.filter(i=>i.storeId===sid).length===0)return 0;
+    const open=db.stores[sid]?.openingMonth;if(!open)return 0;
   const cur=nowM();let perished=0;let m=open;
   while(m<cur){
     const ph=getPhase(sid,m);
