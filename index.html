@@ -719,11 +719,22 @@ function openStoreModal(sid){
       <div style="height:6px;background:var(--bd);border-radius:99px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${Math.min(100,pct)}%;background:${pct>85?'var(--rd)':pct>60?'var(--am)':'var(--gn)'};border-radius:99px"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)"><span>${pct}% utilised</span><span>${ph?`<span class="badge ${ph.badge}">${ph.label}</span>`:'—'}</span></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:16px;color:var(--tx2)">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px;margin-bottom:16px;color:var(--tx2)">
+      <div>Store Code: <span style="color:var(--tx)">${s.storeCode||'—'}</span></div>
+      <div>Zone: <span style="color:var(--tx)">${s.zone||'—'}</span></div>
+      <div>State: <span style="color:var(--tx)">${s.state||'—'}</span></div>
       <div>City: <span style="color:var(--tx)">${s.city||'—'}</span></div>
-      <div>Owner: <span style="color:var(--tx)">${s.owner||'—'}</span></div>
       <div>Phone: <span style="color:var(--tx)">${s.phone||'—'}</span></div>
-      <div>Opening: <span style="color:var(--tx)">${mLabel(s.openingMonth)}</span></div>
+      <div>Email: <span style="color:var(--tx)">${s.email||'—'}</span></div>
+      <div>Location Type: <span style="color:var(--tx)">${s.locationType||'—'}</span></div>
+      <div>Location: <span style="color:var(--tx)">${s.location||'—'}</span></div>
+      <div>Address: <span style="color:var(--tx)">${s.address||'—'}</span></div>
+      <div>Pin Code: <span style="color:var(--tx)">${s.pinCode||'—'}</span></div>
+      <div>Store Size: <span style="color:var(--tx)">${s.storeSize||'—'} sq ft</span></div>
+      <div>Floor: <span style="color:var(--tx)">${s.floor||'—'}</span></div>
+      <div>GST: <span style="color:var(--tx)">${s.gst||'—'}</span></div>
+      <div>Soft Launch: <span style="color:var(--tx)">${mLabel(s.softLaunchDate)}</span></div>
+      <div>Inauguration: <span style="color:var(--tx)">${mLabel(s.inaugurationDate)}</span></div>
     </div>
     <hr class="dv">
     <div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Inventory history</div>
@@ -738,16 +749,30 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 // ── STORES CRUD ──
 async function addStore(){
   const name=document.getElementById('st-name').value.trim();
+  const storeCode=document.getElementById('st-code').value.trim();
+  const zone=document.getElementById('st-zone').value.trim();
+  const state=document.getElementById('st-state').value.trim();
   const city=document.getElementById('st-city').value.trim();
-  const owner=document.getElementById('st-owner').value.trim();
+  const softLaunchDate=document.getElementById('st-soft').value;
+  const inaugurationDate=document.getElementById('st-inaug').value;
   const phone=document.getElementById('st-phone').value.trim();
-  const open=document.getElementById('st-open').value;
-  if(!name||!open){toast('Store name and opening month are required');return;}
-  const id=uid(),store={id,name,city,owner,phone,openingMonth:open};
+  const email=document.getElementById('st-email').value.trim();
+  const locationType=document.getElementById('st-loctype').value;
+  const location=document.getElementById('st-location').value.trim();
+  const address=document.getElementById('st-address').value.trim();
+  const pinCode=document.getElementById('st-pin').value.trim();
+  const storeSize=document.getElementById('st-size').value.trim();
+  const floor=document.getElementById('st-floor').value.trim();
+  const gst=document.getElementById('st-gst').value.trim();
+  if(!name||!inaugurationDate){toast('Store name and inauguration date are required');return;}
+  const id=uid(),store={id,name,storeCode,zone,state,city,softLaunchDate,inaugurationDate,openingMonth:inaugurationDate,phone,email,locationType,location,address,pinCode,storeSize,floor,gst};
   db.stores[id]=store;
   await sheetsSave('addStore',store);
   refreshDropdowns();renderStoreDir();renderDashboard();
-  ['st-name','st-city','st-owner','st-phone'].forEach(i=>document.getElementById(i).value='');
+  ['st-name','st-code','st-zone','st-state','st-city','st-phone','st-email','st-location','st-address','st-pin','st-size','st-floor','st-gst'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('st-soft').value='';
+  document.getElementById('st-inaug').value='';
+  document.getElementById('st-loctype').value='';
   toast('Store added'+(sheetsConnected?' · Sheets':' · local'));
 }
 async function deleteStore(sid){
